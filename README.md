@@ -14,3 +14,7 @@ Google Drive folder owner: Andres
 Sayed Ahmad Sahim
 sahim@campus.tu-berlin.de
 015214874335
+
+Amin Gul Zakhil	
+a.zakhil@compus.tu-berlin.de
+015211528840
