@@ -1,3 +1,4 @@
+### IDEs
 # Eclipse
 .classpath
 .project
@@ -11,6 +12,8 @@
 # Mac
 .DS_Store
 
+### Java
+
 # Java
 *.class
 
@@ -21,3 +24,16 @@
 
 # virtual machine crash logs
 hs_err_pid*
+
+### Gradle
+.gradle
+/build
+/captures
+gradle-app.setting
+# avoid ignoring gradle wrapper jar file
+!gradle-wrapper.jar
+.gradletasknamecache
+/local.properties
+
+### Vim - not so important but Thomas uses vim a lot, so better it's included
+*.swp
