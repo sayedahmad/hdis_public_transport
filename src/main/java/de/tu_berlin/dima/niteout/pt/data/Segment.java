@@ -1,6 +1,6 @@
 package de.tu_berlin.dima.niteout.pt.data;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Represents a single part of a route between two locations.
@@ -10,8 +10,8 @@ public class Segment {
     private TransportMode mode;
     private Location startLocation;
     private Location destinationLocation;
-    private LocalDate departureTime;
-    private LocalDate arrivalTime;
+    private LocalDateTime departureTime;
+    private LocalDateTime arrivalTime;
 
     public TransportMode getMode() {
         return mode;
@@ -37,19 +37,19 @@ public class Segment {
         this.destinationLocation = destinationLocation;
     }
 
-    public LocalDate getDepartureTime() {
+    public LocalDateTime getDepartureTime() {
         return departureTime;
     }
 
-    public void setDepartureTime(LocalDate departureTime) {
+    public void setDepartureTime(LocalDateTime departureTime) {
         this.departureTime = departureTime;
     }
 
-    public LocalDate getArrivalTime() {
+    public LocalDateTime getArrivalTime() {
         return arrivalTime;
     }
 
-    public void setArrivalTime(LocalDate arrivalTime) {
+    public void setArrivalTime(LocalDateTime arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
 }
