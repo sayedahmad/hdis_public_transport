@@ -4,22 +4,36 @@ package de.tu_berlin.dima.niteout.pt.data;
  * The location we will use in the NiteOut-PublicTransport module
  */
 public class Location {
-    private String latitude;
-    private String longitude;
+    private double latitude;
+    private double longitude;
 
-    public String getLatitude() {
+    /**
+     * @return the latitude of the location
+     */
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(String latitude) {
+    /**
+     * Set the latitude of the location to a new value
+     * @param latitude new value
+     */
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public String getLongitude() {
+    /**
+     * @return the longitude of the location
+     */
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(String longitude) {
+    /**
+     * Set the longitude of the location to a new value
+     * @param longitude new value
+     */
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 }
