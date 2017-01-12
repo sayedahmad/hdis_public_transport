@@ -4,6 +4,7 @@ import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
 import com.google.maps.model.*;
 import de.tu_berlin.dima.niteout.pt.data.Location;
+import de.tu_berlin.dima.niteout.pt.data.PublicTransportException;
 import de.tu_berlin.dima.niteout.pt.data.Segment;
 import de.tu_berlin.dima.niteout.pt.data.TransportMode;
 
@@ -22,6 +23,7 @@ public class GoogleApiWrapper implements PublicTransportDataSource {
 
     /**
      * Creates a new wrapper of a data source for public transporting using the Google API
+     *
      * @param apiKey the API key for the google API
      */
     public GoogleApiWrapper(String apiKey) {
@@ -29,7 +31,7 @@ public class GoogleApiWrapper implements PublicTransportDataSource {
     }
 
     @Override
-    public List<Segment> getDirections(Location start, Location destination, LocalDateTime departureTime) {
+    public List<Segment> getDirections(Location start, Location destination, LocalDateTime departureTime) throws PublicTransportException {
 
         // creating context
         GeoApiContext context = new GeoApiContext().setApiKey(apiKey);
@@ -42,52 +44,40 @@ public class GoogleApiWrapper implements PublicTransportDataSource {
 
             System.out.println(directions);
         } catch (Exception e) {
-            // TODO E raise error
+            throw new PublicTransportException("Error when calling API", e);
         }
 
-        if (directions != null) {
-            List<Segment> segments = new ArrayList<>();
-
-            // Go only through first route, google already sorts for best one
-            // and anyways we do not make the call with alternatives, we only
-            // ask for one route
-            // TODO D add url sources from google api
-            for (DirectionsLeg leg : directions.routes[0].legs) {
-                // TODO E raise error when array empty
-                segments.add(legToSegment(leg));
-            }
-
-            // TODO E raise error when no segments found
-            return segments;
+        if (directions == null || directions.routes.length == 0) {
+            throw new PublicTransportException("No routes found for input");
         }
-        // TODO E raise error instead of returning an empty list
-        return new ArrayList<>();
+
+
+        // Go only through first route, google already sorts for best one
+        // and anyways we do not make the call with alternatives, we only
+        // ask for one route
+        // TODO D add url sources from google api
+        List<Segment> segments = new ArrayList<>();
+        for (DirectionsLeg leg : directions.routes[0].legs) {
+            segments.add(legToSegment(leg));
+        }
+        return segments;
     }
 
-    private Segment legToSegment(DirectionsLeg leg) {
-        Segment segment = new Segment();
-
-        // TODO DISCUSS in next meeting: google optimized start location or input one?
-        segment.setStartLocation(latLngToLocation(leg.startLocation));
-        segment.setDestinationLocation(latLngToLocation(leg.endLocation));
-        if (leg.departureTime != null) {
-            segment.setDepartureTime(toJavaTime(leg.departureTime));
-        } else {
-            // TODO change later
-            System.out.println("Warning: no departure time was set");
-        }
-        if (leg.arrivalTime != null) {
-            segment.setArrivalTime(toJavaTime(leg.arrivalTime));
-        } else {
-            // TODO change later
-            System.out.println("Warning: no arrival time was set");
+    private Segment legToSegment(DirectionsLeg leg) throws PublicTransportException {
+        if (leg.departureTime == null || leg.arrivalTime == null) {
+            throw new PublicTransportException("No departure time set in segment leg");
         }
 
         boolean foundPublicTransport = Arrays.stream(leg.steps).anyMatch(
                 step -> step.travelMode.equals(TravelMode.TRANSIT));
 
+        Segment segment = new Segment();
+        // we return google computed location to return consistent directions
+        segment.setStartLocation(latLngToLocation(leg.startLocation));
+        segment.setDestinationLocation(latLngToLocation(leg.endLocation));
+        segment.setDepartureTime(toJavaTime(leg.departureTime));
+        segment.setArrivalTime(toJavaTime(leg.arrivalTime));
         segment.setMode(foundPublicTransport ? TransportMode.PUBLIC_TRANSPORT : TransportMode.WALKING);
-
         return segment;
     }
 
@@ -102,6 +92,7 @@ public class GoogleApiWrapper implements PublicTransportDataSource {
 
     /**
      * Converts an org.joda.time.DateTime to a java.time.LocalDateTime
+     *
      * @param jodaTime joda time to be converted
      * @return the converted java time
      */
@@ -119,6 +110,7 @@ public class GoogleApiWrapper implements PublicTransportDataSource {
 
     /**
      * Converts an java.time.DateTime to a org.joda.time.DateTime
+     *
      * @param javaTime the java time to be converted
      * @return the converted joda DateTime
      */

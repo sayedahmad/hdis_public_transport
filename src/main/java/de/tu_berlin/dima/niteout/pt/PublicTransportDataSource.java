@@ -1,6 +1,7 @@
 package de.tu_berlin.dima.niteout.pt;
 
 import de.tu_berlin.dima.niteout.pt.data.Location;
+import de.tu_berlin.dima.niteout.pt.data.PublicTransportException;
 import de.tu_berlin.dima.niteout.pt.data.Segment;
 
 import java.time.LocalDateTime;
@@ -19,5 +20,5 @@ public interface PublicTransportDataSource {
      * @param departureTime when the trip should start at
      * @return a list of segments, containing information about the duration and type of transportation
      */
-    List<Segment> getDirections(Location start, Location destination, LocalDateTime departureTime);
+    List<Segment> getDirections(Location start, Location destination, LocalDateTime departureTime) throws PublicTransportException;
 }
