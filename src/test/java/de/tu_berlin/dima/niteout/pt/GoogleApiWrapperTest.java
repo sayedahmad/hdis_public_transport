@@ -22,8 +22,8 @@ public class GoogleApiWrapperTest {
 
     @Before
     public void setup() {
-        ernstReuter = new Location("52.512127", "13.322874");
-        hotelWaldorfAstoria = new Location("52.505831", "13.333122");
+        ernstReuter = new Location(52.512127, 13.322874);
+        hotelWaldorfAstoria = new Location(52.505831, 13.333122);
         departureTime = LocalDateTime.now();
     }
 

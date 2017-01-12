@@ -2,10 +2,7 @@ package de.tu_berlin.dima.niteout.pt;
 
 import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
-import com.google.maps.model.DirectionsLeg;
-import com.google.maps.model.DirectionsResult;
-import com.google.maps.model.LatLng;
-import com.google.maps.model.TravelMode;
+import com.google.maps.model.*;
 import de.tu_berlin.dima.niteout.pt.data.Location;
 import de.tu_berlin.dima.niteout.pt.data.Segment;
 import de.tu_berlin.dima.niteout.pt.data.TransportMode;
@@ -45,43 +42,50 @@ public class GoogleApiWrapper implements PublicTransportDataSource {
 
             System.out.println(directions);
         } catch (Exception e) {
-            // TODO raise error
+            // TODO E raise error
         }
 
         if (directions != null) {
             List<Segment> segments = new ArrayList<>();
 
-            // TODO go through all routes, not just first one, return them all
+            // Go only through first route, google already sorts for best one
+            // and anyways we do not make the call with alternatives, we only
+            // ask for one route
+            // TODO D add url sources from google api
             for (DirectionsLeg leg : directions.routes[0].legs) {
+                // TODO E raise error when array empty
                 segments.add(legToSegment(leg));
             }
 
-            // TODO raise error when no segments found
+            // TODO E raise error when no segments found
             return segments;
         }
-        // TODO raise error instead of returning an empty list
+        // TODO E raise error instead of returning an empty list
         return new ArrayList<>();
     }
 
     private Segment legToSegment(DirectionsLeg leg) {
         Segment segment = new Segment();
 
-        // TODO DISCUSS: google optimized start location or input one?
+        // TODO DISCUSS in next meeting: google optimized start location or input one?
         segment.setStartLocation(latLngToLocation(leg.startLocation));
         segment.setDestinationLocation(latLngToLocation(leg.endLocation));
         if (leg.departureTime != null) {
             segment.setDepartureTime(toJavaTime(leg.departureTime));
         } else {
+            // TODO change later
             System.out.println("Warning: no departure time was set");
         }
         if (leg.arrivalTime != null) {
             segment.setArrivalTime(toJavaTime(leg.arrivalTime));
         } else {
+            // TODO change later
             System.out.println("Warning: no arrival time was set");
         }
 
         boolean foundPublicTransport = Arrays.stream(leg.steps).anyMatch(
                 step -> step.travelMode.equals(TravelMode.TRANSIT));
+
         segment.setMode(foundPublicTransport ? TransportMode.PUBLIC_TRANSPORT : TransportMode.WALKING);
 
         return segment;
@@ -93,8 +97,7 @@ public class GoogleApiWrapper implements PublicTransportDataSource {
      * Transforms a google LatLng to a Location
      */
     public static Location latLngToLocation(LatLng latLng) {
-        // TODO: write test for this method!
-        return new Location(Double.toString(latLng.lat), Double.toString(latLng.lng));
+        return new Location(latLng.lat, latLng.lng);
     }
 
     /**
@@ -103,7 +106,7 @@ public class GoogleApiWrapper implements PublicTransportDataSource {
      * @return the converted java time
      */
     public static LocalDateTime toJavaTime(org.joda.time.DateTime jodaTime) {
-        // TODO: write test for this method!
+        // TODO: write test for this method! - @Sahim
         return LocalDateTime.of(
                 jodaTime.getYear(),
                 jodaTime.getMonthOfYear(),
