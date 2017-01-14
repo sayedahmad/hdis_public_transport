@@ -1,4 +1,4 @@
-package de.tu_berlin.dima.niteout.pt.data;
+package de.tu_berlin.dima.niteout.pt.model;
 
 import java.time.LocalDate;
 
