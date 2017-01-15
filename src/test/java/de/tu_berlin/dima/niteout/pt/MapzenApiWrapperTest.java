@@ -2,10 +2,13 @@ package de.tu_berlin.dima.niteout.pt;
 
 
 import de.tu_berlin.dima.niteout.pt.model.mapzen.CostingModel;
+import org.junit.Assert;
 import org.junit.Test;
 import de.tu_berlin.dima.niteout.pt.model.*;
 
+import javax.json.JsonObject;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 /**
  * Test class for {@link MapzenApiWrapper}.
@@ -17,13 +20,34 @@ public class MapzenApiWrapperTest {
     private final Location HbfLocation = new Location(13.369563, 52.524742);
 
     @Test
-    public void getRouteResponse() {
+    public void getWalkingTripTime() {
 
         MapzenApiWrapper fixture = new MapzenApiWrapper(this.apiKey);
+        int tripDuration = 0;
+
         try {
-            String response = fixture.getRouteResponse(TuLocation, HbfLocation, CostingModel.PEDESTRIAN);
-        } catch (IOException e) {
+            tripDuration = fixture.getWalkingTripTime(TuLocation, HbfLocation);
+        } catch (Exception e) {
             e.printStackTrace();
+            Assert.fail();
         }
+
+        Assert.assertNotEquals(tripDuration, -1);
+    }
+
+    @Test
+    public void getPublicTransportTripTime() {
+
+        MapzenApiWrapper fixture = new MapzenApiWrapper(this.apiKey);
+        int tripDuration = 0;
+
+        try {
+            tripDuration = fixture.getPublicTransportTripTime(TuLocation, HbfLocation, LocalDateTime.now());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+
+        Assert.assertNotEquals(tripDuration, -1);
     }
 }
