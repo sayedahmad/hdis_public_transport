@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;
@@ -16,21 +17,16 @@ import static org.junit.Assert.assertTrue;
  */
 public class GoogleApiWrapperTest {
 
-    private Location ernstReuter;
-    private Location hotelWaldorfAstoria;
-    private LocalDateTime departureTime;
+    private final static Location ALEX = new Location(52.521918, 13.412818);
+    private final static Location BRANDENBURGER_TOR = new Location(52.516298, 13.378482);
+    public final static LocalDateTime PUBLIC_TRANSPORT_TRIP_START_TIME = LocalDateTime.of(2017, Month.JANUARY, 19, 10, 10);
 
-    @Before
-    public void setup() {
-        ernstReuter = new Location(52.512127, 13.322874);
-        hotelWaldorfAstoria = new Location(52.505831, 13.333122);
-        departureTime = LocalDateTime.now();
-    }
+
 
     @Test
     public void getDirections() throws Exception {
         GoogleApiWrapper wrapper = new GoogleApiWrapper("AIzaSyBBA2_glIM1dpWFNZZkCAC_jWNj_FrUHsA");
-        List<Segment> directions = wrapper.getDirections(ernstReuter, hotelWaldorfAstoria, departureTime);
+        List<Segment> directions = wrapper.getDirections(ALEX, BRANDENBURGER_TOR, PUBLIC_TRANSPORT_TRIP_START_TIME);
         assertFalse(directions.isEmpty());
         // TODO more asserts like check eg: 1min < duration < 1 hour
     }
