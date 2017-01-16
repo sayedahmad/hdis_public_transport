@@ -1,6 +1,5 @@
 package de.tu_berlin.dima.niteout.routing.data;
 
-
 import java.time.LocalDateTime;
 
 /**

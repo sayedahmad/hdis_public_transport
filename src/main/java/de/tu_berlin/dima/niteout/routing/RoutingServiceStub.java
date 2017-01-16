@@ -3,9 +3,12 @@ package de.tu_berlin.dima.niteout.routing;
 
 import de.tu_berlin.dima.niteout.routing.data.Location;
 import de.tu_berlin.dima.niteout.routing.data.Route;
+import de.tu_berlin.dima.niteout.routing.data.Segment;
 
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RoutingServiceStub implements RoutingAPI {
 
@@ -16,7 +19,7 @@ public class RoutingServiceStub implements RoutingAPI {
 
     public final static LocalDateTime PUBLIC_TRANSPORT_TRIP_START_TIME = LocalDateTime.of(2017, Month.JANUARY, 19, 10, 10);
 
-    private final static int PT_ROUTE_DURATION = 30;
+    private final static int PT_ROUTE_DURATION = 15;
 
     @Override
     public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime startTime) {
@@ -40,8 +43,20 @@ public class RoutingServiceStub implements RoutingAPI {
     @Override
     public Route getPublicTransportDirections(Location start, Location destination, LocalDateTime startTime) {
         if (equalsPTTripProposedRoute(start, destination, startTime)) {
+            Segment segment = new Segment();
+            segment.setDepartureTime(LocalDateTime.of(2017, Month.JANUARY, 19, 10, 12, 38));
+            segment.setArrivalTime(LocalDateTime.of(2017, Month.JANUARY, 19, 10, 26, 43));
+            segment.setStartLocation(new Location(52.5222551, 13.4132278));
+            segment.setDestinationLocation(new Location(52.5162178, 13.378496));
+
+            List<Segment> segments = new ArrayList<Segment>();
+            segments.add(segment);
+
             Route route = new Route();
             route.setDuration(PT_ROUTE_DURATION);
+            route.setSegments(segments);
+
+            return route;
 
         }
         throw new IllegalArgumentException("Please only use the following locations as route: start "
