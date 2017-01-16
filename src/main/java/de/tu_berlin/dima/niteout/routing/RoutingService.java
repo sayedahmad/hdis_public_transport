@@ -54,7 +54,7 @@ public class RoutingService implements RoutingAPI {
     }
 
     /**
-     * The turn-by-torn directions to travel from one location to another by foot
+     * The turn-by-turn directions to travel from one location to another by foot
      * @param start The start location
      * @param destination The destination location
      * @return The Route containing the directions
