@@ -65,8 +65,8 @@ public class HttpHandler {
     this.service = new RestAdapterFactory(this.adapter).getRoutingService();
   }
 
-  public void requestRoute(String routeJson, Callback<String> callback) {
-    service.getRoute(routeJson).enqueue(callback);
+  public void requestRoute(String routeJson, String apiKey, Callback<String> callback) {
+    service.getRoute(routeJson, apiKey).enqueue(callback);
   }
 
   /**

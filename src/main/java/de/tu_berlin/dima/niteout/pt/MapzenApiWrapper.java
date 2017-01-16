@@ -1,13 +1,17 @@
 package de.tu_berlin.dima.niteout.pt;
 
 
+import com.mapzen.valhalla.*;
 import de.tu_berlin.dima.niteout.pt.model.Location;
 import de.tu_berlin.dima.niteout.pt.model.mapzen.CostingModel;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
@@ -32,18 +36,44 @@ class MapzenApiWrapper {
     }
 
     public int getWalkingTripTime(Location start, Location destination) throws Exception {
-        int tripDuration = -1;
+        final int[] tripDuration = {-1};
+        final CountDownLatch latch = new CountDownLatch(1);
 
         try {
-            JsonObject response = getRouteResponse(start, destination, CostingModel.PEDESTRIAN);
-            tripDuration = response.getJsonObject("trip").getJsonObject("summary").getInt("time");
-        } catch (MalformedURLException e) {
-            e.printStackTrace(); //TODO
-        } catch (IOException e) {
-            e.printStackTrace(); //TODO
+            new ValhallaRouter()
+            .setApiKey(this.apiKey)
+            .setWalking()
+            .setLocation(new double[]{start.getLatitude(), start.getLongitude()})
+            .setLocation(new double[]{destination.getLatitude(), destination.getLongitude()})
+            .setCallback(new RouteCallback() {
+
+
+                @Override
+                public void success(@NotNull Route route) {
+                    if (route.foundRoute()) {
+                        tripDuration[0] = route.getTotalTime();
+                        latch.countDown();
+                    }
+                }
+
+                @Override
+                public void failure(int statusCode) {
+
+                }
+            }).fetch();
+            latch.await();
+//            JsonObject response = getRouteResponse(start, destination, CostingModel.PEDESTRIAN);
+//            tripDuration[0] = response.getJsonObject("trip").getJsonObject("summary").getInt("time");
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace(); //TODO
+//        } catch (IOException e) {
+//            e.printStackTrace(); //TODO
+//        }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        return tripDuration;
+        return tripDuration[0];
     }
     public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departureTime) {
         int tripDuration = -1;

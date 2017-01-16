@@ -9,6 +9,7 @@ import java.util.ArrayList
 
 open class ValhallaRouter : Router, Runnable {
 
+    private var apiKey = ""
     private var language = Router.Language.EN_US
     private var type = Router.Type.DRIVING
     private val locations = ArrayList<JSON.Location>()
@@ -18,6 +19,11 @@ open class ValhallaRouter : Router, Runnable {
     private var httpHandler: HttpHandler? = null
 
     var gson: Gson = Gson()
+
+    fun setApiKey(apiKey: String) : Router {
+        this.apiKey = apiKey;
+        return this;
+    }
 
     override fun setHttpHandler(handler: HttpHandler): Router {
         httpHandler = handler
@@ -95,7 +101,7 @@ open class ValhallaRouter : Router, Runnable {
 
     override fun run() {
         var jsonString = gson.toJson(getJSONRequest()).toString()
-        httpHandler?.requestRoute(jsonString, object: Callback<String> {
+        httpHandler?.requestRoute(jsonString, apiKey, object: Callback<String> {
             override fun onResponse(call: Call<String>?, response: Response<String>?) {
                 if (response != null) {
                     if (response.isSuccessful) {
