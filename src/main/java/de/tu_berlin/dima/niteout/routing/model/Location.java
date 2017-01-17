@@ -1,4 +1,4 @@
-package de.tu_berlin.dima.niteout.pt.model;
+package de.tu_berlin.dima.niteout.routing.model;
 
 /**
  * The location we will use in the NiteOut-PublicTransport module

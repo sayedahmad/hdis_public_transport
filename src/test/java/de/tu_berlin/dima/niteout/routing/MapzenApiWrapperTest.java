@@ -1,13 +1,11 @@
-package de.tu_berlin.dima.niteout.pt;
+package de.tu_berlin.dima.niteout.routing;
 
 
-import de.tu_berlin.dima.niteout.pt.model.mapzen.CostingModel;
+import de.tu_berlin.dima.niteout.routing.MapzenApiWrapper;
+import de.tu_berlin.dima.niteout.routing.model.Location;
 import org.junit.Assert;
 import org.junit.Test;
-import de.tu_berlin.dima.niteout.pt.model.*;
 
-import javax.json.JsonObject;
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 /**

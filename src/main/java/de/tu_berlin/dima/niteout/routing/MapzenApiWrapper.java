@@ -1,8 +1,8 @@
-package de.tu_berlin.dima.niteout.pt;
+package de.tu_berlin.dima.niteout.routing;
 
 
-import de.tu_berlin.dima.niteout.pt.model.Location;
-import de.tu_berlin.dima.niteout.pt.model.mapzen.CostingModel;
+import de.tu_berlin.dima.niteout.routing.model.Location;
+import de.tu_berlin.dima.niteout.routing.model.mapzen.CostingModel;
 
 import java.io.*;
 import java.net.*;

@@ -1,4 +1,4 @@
-package de.tu_berlin.dima.niteout.pt.model.mapzen;
+package de.tu_berlin.dima.niteout.routing.model.mapzen;
 
 
 public enum CostingModel {
