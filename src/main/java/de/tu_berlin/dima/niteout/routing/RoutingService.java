@@ -1,7 +1,7 @@
 package de.tu_berlin.dima.niteout.routing;
 
-import de.tu_berlin.dima.niteout.routing.data.Location;
-import de.tu_berlin.dima.niteout.routing.data.Route;
+import de.tu_berlin.dima.niteout.routing.model.Location;
+import de.tu_berlin.dima.niteout.routing.model.Route;
 
 import java.time.LocalDateTime;
 

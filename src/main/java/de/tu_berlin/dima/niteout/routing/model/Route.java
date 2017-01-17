@@ -1,4 +1,4 @@
-package de.tu_berlin.dima.niteout.routing.data;
+package de.tu_berlin.dima.niteout.routing.model;
 
 import java.util.List;
 
