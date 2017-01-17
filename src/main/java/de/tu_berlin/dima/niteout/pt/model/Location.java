@@ -1,4 +1,4 @@
-package de.tu_berlin.dima.niteout.routing.data;
+package de.tu_berlin.dima.niteout.pt.model;
 
 /**
  * The location we will use in the NiteOut-PublicTransport module
@@ -6,14 +6,6 @@ package de.tu_berlin.dima.niteout.routing.data;
 public class Location {
     private double latitude;
     private double longitude;
-
-    public Location() {
-    }
-    
-    public Location(double latitude, double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
 
     /**
      * @return the latitude of the location
