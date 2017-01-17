@@ -4,6 +4,7 @@ package de.tu_berlin.dima.niteout.routing;
 import de.tu_berlin.dima.niteout.routing.data.Location;
 import de.tu_berlin.dima.niteout.routing.data.Route;
 import de.tu_berlin.dima.niteout.routing.data.Segment;
+import de.tu_berlin.dima.niteout.routing.data.TransportMode;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -48,6 +49,7 @@ public class RoutingServiceStub implements RoutingAPI {
             segment.setArrivalTime(LocalDateTime.of(2017, Month.JANUARY, 19, 10, 26, 43));
             segment.setStartLocation(new Location(52.5222551, 13.4132278));
             segment.setDestinationLocation(new Location(52.5162178, 13.378496));
+            segment.setMode(TransportMode.PUBLIC_TRANSPORT);
 
             List<Segment> segments = new ArrayList<Segment>();
             segments.add(segment);
