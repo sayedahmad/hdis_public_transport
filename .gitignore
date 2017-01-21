@@ -37,3 +37,4 @@ gradle-app.setting
 
 ### Vim - not so important but Thomas uses vim a lot, so better it's included
 *.swp
+/bin/
