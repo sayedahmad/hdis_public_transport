@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 public class MapzenApiWrapperTest {
 
     private final String apiKey = "mapzen-pj9Lo9N";
-    private final Location TuLocation = new Location(13.32697, 52.51221);
-    private final Location HbfLocation = new Location(13.369563, 52.524742);
+    private final Location TuLocation = new Location(52.51221, 13.32697);
+    private final Location HbfLocation = new Location(52.524742, 13.369563);
 
     @Test
     public void getWalkingTripTime() {
