@@ -1,17 +1,16 @@
 package de.tu_berlin.dima.niteout.routing;
 
 import de.tu_berlin.dima.niteout.routing.model.Location;
+import de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry;
 import de.tu_berlin.dima.niteout.routing.model.mapzen.CostingModel;
 import de.tu_berlin.dima.niteout.routing.model.mapzen.MatrixType;
+import de.tu_berlin.dima.niteout.routing.model.mapzen.Units;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.javatuples.Pair;
-import org.javatuples.Triplet;
 
 import javax.json.*;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +23,7 @@ class MapzenMatrixApiWrapper {
     private final String apiKey;
     private final String urlFormat = "https://matrix.mapzen.com/%s?json=%s&api_key=%s";
     private OkHttpClient httpClient;
+    private final Units DistanceUnits = Units.KM;
 
     public MapzenMatrixApiWrapper(String apiKey) {
         this.apiKey = apiKey;
@@ -37,42 +37,85 @@ class MapzenMatrixApiWrapper {
         Response response = this.httpClient.newCall(request).execute();
 
         JsonReader jsonReader = Json.createReader(response.body().charStream());
-        JsonObject responseJsonObject = jsonReader.readObject();
 
-        return responseJsonObject;
+        return jsonReader.readObject();
     }
-    
-    public List<Pair<Location, Integer>> getWalkingMatrix(Location start, Location[] destinations) throws IOException {
+
+    /**
+     * Gets a one-to-many time matrix between the starting location and all destinations
+     * @param start the starting location
+     * @param destinations the list of destinations
+     * @return the time matrix
+     * @throws IOException
+     */
+    public List<TimeMatrixEntry> getWalkingMatrix(Location start, Location[] destinations) throws IOException {
 
         JsonBuilder jsonBuilder = new JsonBuilder();
         jsonBuilder.addLocation(start);
         jsonBuilder.addLocations(destinations);
-        JsonObject requestJsonObject = jsonBuilder.build();
+        JsonObject requestJsonObject = jsonBuilder.build(this.DistanceUnits);
 
-        JsonObject response = this.getResponse(MatrixType.OneToMany, requestJsonObject);
+        JsonObject response = this.getResponse(MatrixType.ONE_TO_MANY, requestJsonObject);
         //TODO check for error(s) in response
-        JsonArray outerArray = response.getJsonArray(MatrixType.OneToMany.getApiString());
-        JsonArray innerAray = outerArray.getJsonArray(0);
+        String units = response.getString("units");
+        JsonArray outerArray = response.getJsonArray(MatrixType.ONE_TO_MANY.getApiString());
+        JsonArray innerArray = outerArray.getJsonArray(0);
 
-        ArrayList<Pair<Location, Integer>> out = new ArrayList(destinations.length);
+        ArrayList<TimeMatrixEntry> out = new ArrayList<>(destinations.length);
 
-        for (JsonValue value : innerAray) {
+        for (JsonValue value : innerArray) {
             JsonObject jsonObject = (JsonObject)value;
             int index = jsonObject.getInt("to_index");
             if (index == 0) { continue; } // skip 'from_index' : 0 'to_index' : 0 since it's the departure/start point
-            int seconds = jsonObject.getInt("time");
-            out.add(new Pair<Location, Integer>(destinations[index-1], seconds));
+
+            TimeMatrixEntry entry = new TimeMatrixEntry(
+                    0,
+                    index - 1,
+                    jsonObject.getInt("time"),
+                    jsonObject.getJsonNumber("distance").doubleValue(),
+                    units
+            );
+            out.add(entry);
         }
 
         return out;
     }
 
-    public void getWalkingMatrix(Location[] startLocations, Location destinationLocation) {
+    public List<TimeMatrixEntry> getWalkingMatrix(
+            Location[] startLocations, Location destinationLocation)
+            throws IOException {
+        JsonBuilder jsonBuilder = new JsonBuilder();
+        jsonBuilder.addLocations(startLocations);
+        jsonBuilder.addLocation(destinationLocation);
+        JsonObject requestJsonObject = jsonBuilder.build(this.DistanceUnits);
+
+        JsonObject response = this.getResponse(MatrixType.MANY_TO_ONE, requestJsonObject);
+        //TODO check for error(s) in response
+        String units = response.getString("units");
+
+        ArrayList<TimeMatrixEntry> out = new ArrayList<>(startLocations.length);
+
+        for (JsonValue jsonValue : response.getJsonArray(MatrixType.MANY_TO_ONE.getApiString())) {
+            JsonArray innerArray = (JsonArray)jsonValue;
+            JsonObject jsonObject = innerArray.getJsonObject(0);
+            int fromIndex = jsonObject.getInt("from_index");
+            if (fromIndex >= startLocations.length) continue; //skip last combination ("from destination to destination")
+
+            TimeMatrixEntry entry = new TimeMatrixEntry(
+                    fromIndex,
+                    0,
+                    jsonObject.getInt("time"),
+                    jsonObject.getJsonNumber("distance").doubleValue(),
+                    units
+            );
+            out.add(entry);
+        }
+        return out;
 
     }
 
-    public void getWalkingMatrix(Location[] startLocations, Location[] destinationLocations) {
-
+    public List<TimeMatrixEntry> getWalkingMatrix(Location[] startLocations, Location[] destinationLocations) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     private class JsonBuilder {
@@ -99,11 +142,11 @@ class MapzenMatrixApiWrapper {
                     .build();
         }
 
-        public JsonObject build() {
+        public JsonObject build(Units units) {
             builder.add("locations", arrayBuilder.build())
                     .add("costing", CostingModel.PEDESTRIAN.getApiString())
-                    .add("units", "km")
-            ;
+                    .add("units", units.getApiString());
+
             return builder.build();
         }
     }

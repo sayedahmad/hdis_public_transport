@@ -5,10 +5,10 @@ package de.tu_berlin.dima.niteout.routing.model.mapzen;
  */
 public enum MatrixType {
 
-    OneToMany ("one_to_many"),
-    ManyToOne ("many_to_one"),
-    ManyToMany ("many_to_many"),
-    SourcesToTargets ("sources_to_targets");
+    ONE_TO_MANY         ("one_to_many"),
+    MANY_TO_ONE         ("many_to_one"),
+    MANY_TO_MANY        ("many_to_many"),
+    SOURCES_TO_TARGETS  ("sources_to_targets");
 
     private final String ApiString;
 
