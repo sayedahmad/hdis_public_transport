@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 public class ExampleApiWrapperTest {
 
     @Test
-    public void getEmptyRoute() throws Exception {
+    public void getApiKey() throws Exception {
         Object key = System.getProperty("API_KEY_EXAMPLEAPI");
         assertNotNull(key);
         assertEquals(key, "abc123");
