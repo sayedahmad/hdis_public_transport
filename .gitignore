@@ -34,6 +34,7 @@ gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
 /local.properties
+api-keys.properties
 
 ### Vim - not so important but Thomas uses vim a lot, so better it's included
 *.swp
