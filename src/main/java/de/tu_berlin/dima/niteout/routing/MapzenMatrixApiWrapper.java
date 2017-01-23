@@ -84,6 +84,7 @@ class MapzenMatrixApiWrapper {
     public List<TimeMatrixEntry> getWalkingMatrix(
             Location[] startLocations, Location destinationLocation)
             throws IOException {
+
         JsonBuilder jsonBuilder = new JsonBuilder();
         jsonBuilder.addLocations(startLocations);
         jsonBuilder.addLocation(destinationLocation);
@@ -116,6 +117,34 @@ class MapzenMatrixApiWrapper {
 
     public List<TimeMatrixEntry> getWalkingMatrix(Location[] startLocations, Location[] destinationLocations) {
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public List<TimeMatrixEntry> getWalkingMatrix(Location[] locations) throws IOException {
+        JsonBuilder jsonBuilder = new JsonBuilder();
+        jsonBuilder.addLocations(locations);
+        JsonObject requestJsonObject = jsonBuilder.build(this.DistanceUnits);
+
+        JsonObject response = this.getResponse(MatrixType.MANY_TO_MANY, requestJsonObject);
+        //TODO check for error(s) in response
+        String units = response.getString("units");
+
+        ArrayList<TimeMatrixEntry> out = new ArrayList<>();
+
+        for (JsonValue innerValue : response.getJsonArray(MatrixType.MANY_TO_MANY.getApiString())) {
+            for (JsonValue element : ((JsonArray)innerValue)) {
+                JsonObject jsonObject = (JsonObject)element;
+                TimeMatrixEntry entry = new TimeMatrixEntry(
+                        jsonObject.getInt("from_index"),
+                        jsonObject.getInt("to_index"),
+                        jsonObject.getInt("time"),
+                        jsonObject.getJsonNumber("distance").doubleValue(),
+                        units
+                );
+                out.add(entry);
+            }
+        }
+
+        return out;
     }
 
     private class JsonBuilder {
