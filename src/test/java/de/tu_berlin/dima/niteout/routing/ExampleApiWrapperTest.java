@@ -12,6 +12,7 @@ public class ExampleApiWrapperTest {
 
     @Test
     public void getApiKey() throws Exception {
+        // NOTE: requires the content 'API_KEY_EXAMPLEAPI=abc123' in api-keys.properties
         Object key = System.getProperty("API_KEY_EXAMPLEAPI");
         assertNotNull(key);
         assertEquals(key, "abc123");
