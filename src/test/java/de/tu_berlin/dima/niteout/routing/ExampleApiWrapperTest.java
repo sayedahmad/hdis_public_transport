@@ -13,7 +13,6 @@ public class ExampleApiWrapperTest {
     @Test
     public void getEmptyRoute() throws Exception {
         Object key = System.getProperty("API_KEY_EXAMPLEAPI");
-        System.out.println("the loaded key is: " + key);
         assertNotNull(key);
         assertEquals(key, "abc123");
     }
