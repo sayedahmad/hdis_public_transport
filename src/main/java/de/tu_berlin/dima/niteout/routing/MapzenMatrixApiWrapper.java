@@ -19,10 +19,10 @@ import java.util.List;
 /**
  * Created by aardila on 1/22/2017.
  */
-public class MapzenMatrixApiWrapper {
+class MapzenMatrixApiWrapper {
 
-    private final String urlFormat = "https://matrix.mapzen.com/%s?json=%s&api_key=%s";
     private final String apiKey;
+    private final String urlFormat = "https://matrix.mapzen.com/%s?json=%s&api_key=%s";
     private OkHttpClient httpClient;
 
     public MapzenMatrixApiWrapper(String apiKey) {
@@ -41,27 +41,15 @@ public class MapzenMatrixApiWrapper {
 
         return responseJsonObject;
     }
+    
     public List<Pair<Location, Integer>> getWalkingMatrix(Location start, Location[] destinations) throws IOException {
 
-        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder()
-                .add(Json.createObjectBuilder()
-                    .add("lat", start.getLatitude())
-                    .add("lon", start.getLongitude()));
+        JsonBuilder jsonBuilder = new JsonBuilder();
+        jsonBuilder.addLocation(start);
+        jsonBuilder.addLocations(destinations);
+        JsonObject requestJsonObject = jsonBuilder.build();
 
-        for (Location location : destinations) {
-            arrayBuilder.add(Json.createObjectBuilder()
-                .add("lat", location.getLatitude())
-                .add("lon", location.getLongitude()));
-        }
-
-        JsonObject jsonObject = Json.createObjectBuilder()
-                .add("locations", arrayBuilder.build())
-                .add("costing", CostingModel.PEDESTRIAN.getApiString())
-                .add("units", "km")
-                .build();
-
-
-        JsonObject response = this.getResponse(MatrixType.OneToMany, jsonObject);
+        JsonObject response = this.getResponse(MatrixType.OneToMany, requestJsonObject);
         //TODO check for error(s) in response
         JsonArray outerArray = response.getJsonArray(MatrixType.OneToMany.getApiString());
         JsonArray innerAray = outerArray.getJsonArray(0);
@@ -69,10 +57,10 @@ public class MapzenMatrixApiWrapper {
         ArrayList<Pair<Location, Integer>> out = new ArrayList(destinations.length);
 
         for (JsonValue value : innerAray) {
-            JsonObject jo = (JsonObject)value;
-            int index = jo.getInt("to_index");
+            JsonObject jsonObject = (JsonObject)value;
+            int index = jsonObject.getInt("to_index");
             if (index == 0) { continue; } // skip 'from_index' : 0 'to_index' : 0 since it's the departure/start point
-            int seconds = jo.getInt("time");
+            int seconds = jsonObject.getInt("time");
             out.add(new Pair<Location, Integer>(destinations[index-1], seconds));
         }
 
@@ -85,5 +73,38 @@ public class MapzenMatrixApiWrapper {
 
     public void getWalkingMatrix(Location[] startLocations, Location[] destinationLocations) {
 
+    }
+
+    private class JsonBuilder {
+
+        javax.json.JsonObjectBuilder builder = Json.createObjectBuilder();
+        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+
+        public JsonArrayBuilder addLocation(Location location) {
+            return arrayBuilder.add(getJsonObject(location));
+        }
+
+        public JsonArrayBuilder addLocations(Location[] locations) {
+            for (Location location : locations) {
+                addLocation(location);
+            }
+
+            return arrayBuilder;
+        }
+
+        private JsonObject getJsonObject(Location location) {
+            return Json.createObjectBuilder()
+                    .add("lat", location.getLatitude())
+                    .add("lon", location.getLongitude())
+                    .build();
+        }
+
+        public JsonObject build() {
+            builder.add("locations", arrayBuilder.build())
+                    .add("costing", CostingModel.PEDESTRIAN.getApiString())
+                    .add("units", "km")
+            ;
+            return builder.build();
+        }
     }
 }

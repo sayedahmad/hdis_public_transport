@@ -7,7 +7,8 @@ public enum MatrixType {
 
     OneToMany ("one_to_many"),
     ManyToOne ("many_to_one"),
-    ManyToMany ("many_to_many");
+    ManyToMany ("many_to_many"),
+    SourcesToTargets ("sources_to_targets");
 
     private final String ApiString;
 

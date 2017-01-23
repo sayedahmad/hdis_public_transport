@@ -19,7 +19,7 @@ class MapzenApiWrapper {
     private String apiKey;
     private String uriFormat = "https://valhalla.mapzen.com/route?json=%s&api_key=";
 
-    private static DateTimeFormatter iso8601DateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-DD'T'HH:mm");
+    private static final DateTimeFormatter iso8601DateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-DD'T'HH:mm");
 
 
     public MapzenApiWrapper(String apiKey) {
@@ -29,6 +29,10 @@ class MapzenApiWrapper {
 
         this.apiKey = apiKey;
         this.uriFormat += apiKey;
+    }
+
+    private JsonObject getRouteResponse(Location start, Location destination, CostingModel costingModel) throws MalformedURLException, IOException {
+        return getRouteResponse(start, destination, costingModel, null);
     }
 
     public int getWalkingTripTime(Location start, Location destination) throws Exception {
@@ -45,6 +49,7 @@ class MapzenApiWrapper {
 
         return tripDuration;
     }
+
     public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departureTime) {
         int tripDuration = -1;
 
@@ -59,10 +64,6 @@ class MapzenApiWrapper {
         }
 
         return tripDuration;
-    }
-
-    private JsonObject getRouteResponse(Location start, Location destination, CostingModel costingModel) throws MalformedURLException, IOException {
-        return getRouteResponse(start, destination, costingModel, null);
     }
 
     private JsonObject getRouteResponse(Location start, Location destination, CostingModel costingModel, LocalDateTime departureTime) throws MalformedURLException, IOException {
