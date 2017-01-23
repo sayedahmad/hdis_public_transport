@@ -64,6 +64,7 @@ public class MapzenMatrixApiWrapperTest {
         }
     }
 
+    @Test
     public void testManyToManyMatrix() {
 
         MapzenMatrixApiWrapper fixture = new MapzenMatrixApiWrapper(this.apiKey);
@@ -77,11 +78,39 @@ public class MapzenMatrixApiWrapperTest {
                         LocationDirectory.HAUPTBAHNHOF,
                         LocationDirectory.ALEXANDERPLATZ
                 };
-        Location destination = LocationDirectory.TU_BERLIN;
 
         try {
             List<TimeMatrixEntry> matrix = fixture.getWalkingMatrix(locations);
             Assert.assertEquals((int)Math.pow(locations.length, 2), matrix.size());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testSourcesToTargetsMatrix() {
+
+        MapzenMatrixApiWrapper fixture = new MapzenMatrixApiWrapper(this.apiKey);
+
+        Location[] startLocations =
+                {
+                        LocationDirectory.TU_BERLIN,
+                        LocationDirectory.HAUPTBAHNHOF,
+                        LocationDirectory.ALEXANDERPLATZ
+                };
+
+        Location[] destinations =
+                {
+                        LocationDirectory.POTSDAMER_PLATZ,
+                        LocationDirectory.BRANDENBURGER_TOR,
+                        LocationDirectory.SIEGESSÄULE
+                };
+
+        try {
+            List<TimeMatrixEntry> matrix = fixture.getWalkingMatrix(startLocations, destinations);
+            Assert.assertEquals(startLocations.length * destinations.length, matrix.size());
 
         } catch (IOException e) {
             e.printStackTrace();

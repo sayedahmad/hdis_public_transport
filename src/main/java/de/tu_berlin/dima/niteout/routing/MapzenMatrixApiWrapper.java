@@ -115,8 +115,51 @@ class MapzenMatrixApiWrapper {
 
     }
 
-    public List<TimeMatrixEntry> getWalkingMatrix(Location[] startLocations, Location[] destinationLocations) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    public List<TimeMatrixEntry> getWalkingMatrix(Location[] startLocations, Location[] destinationLocations) throws IOException {
+        JsonArrayBuilder sourcesBuilder = Json.createArrayBuilder();
+        JsonArrayBuilder targetsBuilder = Json.createArrayBuilder();
+        for (Location source : startLocations) {
+            sourcesBuilder.add(serializeLocation(source));
+        }
+        for (Location target : destinationLocations) {
+            targetsBuilder.add(serializeLocation(target));
+        }
+        JsonObject requestJsonObject = Json.createObjectBuilder()
+                .add("sources", sourcesBuilder.build())
+                .add("targets", targetsBuilder.build())
+                .add("costing", "pedestrian")
+                .add("units", this.DistanceUnits.getApiString())
+                .build();
+
+        JsonObject response = this.getResponse(MatrixType.SOURCES_TO_TARGETS, requestJsonObject);
+        //TODO check for error(s) in response
+        String units = response.getString("units");
+        JsonArray outerArray = response.getJsonArray(MatrixType.SOURCES_TO_TARGETS.getApiString());
+        ArrayList<TimeMatrixEntry> out = new ArrayList<>();
+
+        for (JsonValue innerJsonValue : outerArray) {
+            JsonArray innerArray = (JsonArray)innerJsonValue;
+            for (JsonValue value : innerArray) {
+                JsonObject jsonObject = (JsonObject)value;
+                TimeMatrixEntry entry = new TimeMatrixEntry(
+                        jsonObject.getInt("from_index"),
+                        jsonObject.getInt("to_index"),
+                        jsonObject.getInt("time"),
+                        jsonObject.getJsonNumber("distance").doubleValue(),
+                        units
+                );
+                out.add(entry);
+            }
+        }
+
+        return out;
+    }
+
+    private JsonObject serializeLocation(Location location) {
+        return Json.createObjectBuilder()
+                .add("lat", location.getLatitude())
+                .add("lon", location.getLongitude())
+                .build();
     }
 
     public List<TimeMatrixEntry> getWalkingMatrix(Location[] locations) throws IOException {
