@@ -26,6 +26,10 @@ class MapzenMatrixApiWrapper {
     private final Units DistanceUnits = Units.KM;
 
     public MapzenMatrixApiWrapper(String apiKey) {
+
+        if (apiKey == null || apiKey.trim().length() == 0)
+            throw new IllegalArgumentException("apiKey cannot be null or empty");
+
         this.apiKey = apiKey;
         this.httpClient = new OkHttpClient();
     }
