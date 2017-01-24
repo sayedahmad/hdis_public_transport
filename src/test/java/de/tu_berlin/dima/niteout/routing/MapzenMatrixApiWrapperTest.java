@@ -26,7 +26,7 @@ public class MapzenMatrixApiWrapperTest {
         {
             LocationDirectory.POTSDAMER_PLATZ,
             LocationDirectory.BRANDENBURGER_TOR,
-            LocationDirectory.SIEGESSÄULE,
+            LocationDirectory.SIEGESSAEULE,
             LocationDirectory.getRandomLocationInBerlin()
         };
 
@@ -49,7 +49,7 @@ public class MapzenMatrixApiWrapperTest {
                 {
                         LocationDirectory.POTSDAMER_PLATZ,
                         LocationDirectory.BRANDENBURGER_TOR,
-                        LocationDirectory.SIEGESSÄULE,
+                        LocationDirectory.SIEGESSAEULE,
                         LocationDirectory.getRandomLocationInBerlin()
                 };
         Location destination = LocationDirectory.TU_BERLIN;
@@ -74,7 +74,7 @@ public class MapzenMatrixApiWrapperTest {
                         LocationDirectory.TU_BERLIN,
                         LocationDirectory.POTSDAMER_PLATZ,
                         LocationDirectory.BRANDENBURGER_TOR,
-                        LocationDirectory.SIEGESSÄULE,
+                        LocationDirectory.SIEGESSAEULE,
                         LocationDirectory.HAUPTBAHNHOF,
                         LocationDirectory.ALEXANDERPLATZ
                 };
@@ -105,7 +105,7 @@ public class MapzenMatrixApiWrapperTest {
                 {
                         LocationDirectory.POTSDAMER_PLATZ,
                         LocationDirectory.BRANDENBURGER_TOR,
-                        LocationDirectory.SIEGESSÄULE
+                        LocationDirectory.SIEGESSAEULE
                 };
 
         try {

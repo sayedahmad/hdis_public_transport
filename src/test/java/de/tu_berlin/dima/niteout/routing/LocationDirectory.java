@@ -19,7 +19,7 @@ public final class LocationDirectory {
     public static final Location HAUPTBAHNHOF = new Location(52.524742, 13.369563);
     public static final Location BRANDENBURGER_TOR = new Location(52.516289,13.377729);
     public static final Location POTSDAMER_PLATZ = new Location(52.509498,13.376598);
-    public static final Location SIEGESSÄULE = new Location(52.51458, 13.35015);
+    public static final Location SIEGESSAEULE = new Location(52.51458, 13.35015);
     public static final Location ALEXANDERPLATZ = new Location(52.520699, 13.410964);
 
     /**
