@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  */
 public class MapzenApiWrapperTest {
 
-    private final String apiKey = "mapzen-pj9Lo9N";
+    private final String apiKey = System.getProperty("API_KEY_MAPZEN");
 
 
     @Test

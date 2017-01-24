@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class MapzenMatrixApiWrapperTest {
 
-    private final String apiKey = "mapzen-pj9Lo9N";
+    private final String apiKey = System.getProperty("API_KEY_MAPZEN");
 
     @Test
     public void testOneToManyMatrix() {
