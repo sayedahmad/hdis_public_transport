@@ -4,6 +4,7 @@ import de.tu_berlin.dima.niteout.routing.model.Location;
 import de.tu_berlin.dima.niteout.routing.model.Route;
 import de.tu_berlin.dima.niteout.routing.model.RouteSummary;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 // TODO document methods
@@ -20,5 +21,5 @@ public interface RoutingAPI {
 
     RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime);
 
-    RouteSummary getWalkingRouteSummary(Location start, Location destination);
+    RouteSummary getWalkingRouteSummary(Location start, Location destination, LocalDateTime startTime) throws IOException;
 }

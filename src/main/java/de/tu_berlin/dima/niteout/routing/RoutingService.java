@@ -4,6 +4,7 @@ import de.tu_berlin.dima.niteout.routing.model.Location;
 import de.tu_berlin.dima.niteout.routing.model.Route;
 import de.tu_berlin.dima.niteout.routing.model.RouteSummary;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 /**
@@ -73,8 +74,9 @@ public class RoutingService implements RoutingAPI {
     }
 
     @Override
-    public RouteSummary getWalkingRouteSummary(Location start, Location destination) {
-        // TODO implement
-        throw new UnsupportedOperationException("Not yet implemented");
+    public RouteSummary getWalkingRouteSummary(Location start, Location destination, LocalDateTime startTime) throws IOException {
+
+        MapzenApiWrapper mapzenApi = new MapzenApiWrapper(System.getProperty("API_KEY_MAPZEN"));
+        return mapzenApi.getWalkingRouteSummary(start, destination, startTime);
     }
 }
