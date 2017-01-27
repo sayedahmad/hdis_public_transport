@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by aardila on 1/26/2017.
  */
-public class MapzenApiWrapper {
+class MapzenApiWrapper {
 
     private final String apiKey;
 
