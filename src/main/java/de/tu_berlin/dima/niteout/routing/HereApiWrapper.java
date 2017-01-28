@@ -4,6 +4,7 @@ import de.tu_berlin.dima.niteout.routing.model.Location;
 import de.tu_berlin.dima.niteout.routing.model.Route;
 import de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry;
 import de.tu_berlin.dima.niteout.routing.model.mapzen.Units;
+import com.google.common.util.concurrent.RateLimiter;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -18,6 +19,7 @@ import java.io.Reader;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
@@ -51,6 +53,7 @@ public class HereApiWrapper {
     private final static String URL_DEPARTURE = "departure=%s";
     private final static String URL_MODE = "mode=fastest;publicTransport";
     private final static String URL_COMBINE_CHANGE = "combineChange=true";
+    private final static double MAX_API_RPS = 1.0;
 
     private final String apiId;
     private final String apiCode;
@@ -64,6 +67,20 @@ public class HereApiWrapper {
         this.apiId = apiId;
         this.apiCode = apiCode;
     }
+
+    final RateLimiter rateLimiter = RateLimiter.create(MAX_API_RPS);
+//
+//    void submitRequest(Runnable task, Executor executor) {
+//        rateLimiter.acquire(); // may wait
+//        executor.execute(task);
+//    }
+//
+//    void submitRequests(List<Runnable> tasks, Executor executor) {
+//        for (Runnable task : tasks) {
+//            rateLimiter.acquire(); // may wait
+//            executor.execute(task);
+//        }
+//    }
 
     public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure) {
 
@@ -102,14 +119,18 @@ public class HereApiWrapper {
     }
 
     public List<TimeMatrixEntry> getMultiModalMatrix(Location[] startLocations, Location[] destinationLocations,
-                                                     LocalDateTime departure) {
+                                                     LocalDateTime departureTime) {
 
-        IntStream startIndices = IntStream.range(0, startLocations.length);
+        IntStream startIndices = IntStream.range(0, startLocations.length - 1);
 
-        return startIndices.parallel().mapToObj(i -> IntStream.range(0, destinationLocations.length).parallel().mapToObj(j ->
-                    getMatrixEntry(i, j, startLocations[i], destinationLocations[j], departure))
-                    .collect(toList()))
-                .flatMap(Collection::stream).collect(toList());
+        return startIndices.parallel()
+                .mapToObj(i -> IntStream.range(0, destinationLocations.length - 1)
+                        //.parallel()
+                        .mapToObj(j ->
+                                getMatrixEntry(i, j, startLocations[i], destinationLocations[j], departureTime))
+                        .collect(toList()))
+                .flatMap(l -> l.stream())
+                .collect(toList());
     }
 
     private TimeMatrixEntry getMatrixEntry(int fromIndex, int toIndex, Location start, Location destination,
@@ -151,15 +172,16 @@ public class HereApiWrapper {
 
         System.out.println("call URL " + url);
 
-        UrlValidator urlValidator = new UrlValidator();
-        assert urlValidator.isValid(url);
+//        UrlValidator urlValidator = new UrlValidator();
+//        assert urlValidator.isValid(url);
 
         Request request = new Request.Builder()
                 .url(url)
                 .build();
 
+        rateLimiter.acquire();
         Response response = getHTTPClient().newCall(request).execute();
-            return response.body().charStream();
+        return response.body().charStream();
     }
 
     private String buildURL(Location start, Location destination, LocalDateTime departure) {
@@ -182,10 +204,7 @@ public class HereApiWrapper {
     }
 
     private static String formatParameter(boolean firstParameter, String parameterTemplate, Object... args) {
-        if (firstParameter) {
-            return "?" + String.format(parameterTemplate, args);
-        }
-        return "&" + String.format(parameterTemplate, args);
+        return (firstParameter ? "?" : "&") + String.format(parameterTemplate, args);
     }
 
     private OkHttpClient getHTTPClient() {

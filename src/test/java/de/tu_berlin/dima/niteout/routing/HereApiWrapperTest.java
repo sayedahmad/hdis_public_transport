@@ -1,5 +1,6 @@
 package de.tu_berlin.dima.niteout.routing;
 
+import de.tu_berlin.dima.niteout.routing.model.BoundingBox;
 import de.tu_berlin.dima.niteout.routing.model.Location;
 import de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry;
 import org.junit.Assert;
@@ -18,6 +19,7 @@ public class HereApiWrapperTest {
 
     private static Location[] B_TOR_ARRAY_MANY = (Location[]) fillWith(new Location[500], BRANDENBURGER_TOR);
     private static Location[] B_TOR_ARRAY_ONE = {BRANDENBURGER_TOR};
+    private static BoundingBox BERLIN_MITTE = new BoundingBox(13.3295,52.4849, 13.4483, 52.5439);
 
     private HereApiWrapper api;
 
@@ -37,10 +39,10 @@ public class HereApiWrapperTest {
         Location[] starts = new Location[5],
             destinations = new Location[10];
         for (int i = 0; i < starts.length; i++) {
-            starts[i] = LocationDirectory.getRandomLocationInBerlin();
+            starts[i] = LocationDirectory.getRandomLocation(BERLIN_MITTE);
         }
         for (int i = 0; i < destinations.length; i++) {
-            destinations[i] = LocationDirectory.getRandomLocationInBerlin();
+            destinations[i] = LocationDirectory.getRandomLocation(BERLIN_MITTE);
         }
         List<TimeMatrixEntry> list =
                 api.getMultiModalMatrix(starts, destinations, LocalDateTime.now());
