@@ -12,6 +12,7 @@ import java.util.List;
 import static de.tu_berlin.dima.niteout.routing.LocationDirectory.ALEXANDERPLATZ;
 import static de.tu_berlin.dima.niteout.routing.LocationDirectory.BRANDENBURGER_TOR;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 public class HereApiWrapperTest {
 
@@ -26,9 +27,15 @@ public class HereApiWrapperTest {
     }
 
     @Test
+    public void getTimeTest() {
+        int time = api.getPublicTransportTripTime(BRANDENBURGER_TOR, ALEXANDERPLATZ, LocalDateTime.now());
+        assertTrue(time > 0);
+    }
+
+    @Test
     public void getMatrixTest() {
-        Location[] starts = new Location[30],
-            destinations = new Location[20];
+        Location[] starts = new Location[5],
+            destinations = new Location[10];
         for (int i = 0; i < starts.length; i++) {
             starts[i] = LocationDirectory.getRandomLocationInBerlin();
         }
@@ -38,12 +45,6 @@ public class HereApiWrapperTest {
         List<TimeMatrixEntry> list =
                 api.getMultiModalMatrix(starts, destinations, LocalDateTime.now());
         int i = 5;
-    }
-
-    @Test
-    public void getTimeTest() {
-        int time = api.getPublicTransportTripTime(BRANDENBURGER_TOR, ALEXANDERPLATZ, LocalDateTime.now());
-        assertNotEquals(time, 0);
     }
 
     private static Object[] fillWith(Object[] array, Object filler) {

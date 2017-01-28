@@ -8,12 +8,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.validator.routines.UrlValidator;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.stream.JsonParsingException;
-import javax.naming.OperationNotSupportedException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -67,19 +65,19 @@ public class HereApiWrapper {
         this.apiCode = apiCode;
     }
 
-
     public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure) {
 
-        Reader response = null;
+        Reader responseReader = null;
         try {
-            response = getHTTPResponse(start, destination, departure);
+            responseReader = getHTTPResponse(start, destination, departure);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         JsonObject json = null;
 
         try {
-            json = Json.createReader(response).readObject();
+            json = Json.createReader(responseReader).readObject();
         } catch (JsonParsingException e) {
             System.out.println(LocalDateTime.now() + ":: getTime fail     #" + start + ":" + destination + "\t " +
                     e.getMessage());
@@ -100,9 +98,8 @@ public class HereApiWrapper {
     }
 
     public Route getPublicTransportDirections(Location start, Location destination, LocalDateTime startTime) {
-       throw new NotImplementedException();
+       throw new UnsupportedOperationException("Not yet implemented");
     }
-
 
     public List<TimeMatrixEntry> getMultiModalMatrix(Location[] startLocations, Location[] destinationLocations,
                                                      LocalDateTime departure) {
@@ -118,7 +115,7 @@ public class HereApiWrapper {
     private TimeMatrixEntry getMatrixEntry(int fromIndex, int toIndex, Location start, Location destination,
                                            LocalDateTime departure) {
 
-        String units = Units.KM.getApiString();
+        final String units = Units.KM.getApiString();
 
         System.out.println(LocalDateTime.now() + ":: request  #" + toIndex + ":" + fromIndex);
         Reader response = null;
@@ -150,7 +147,7 @@ public class HereApiWrapper {
     }
 
     private Reader getHTTPResponse(Location start, Location destination, LocalDateTime departure) throws IOException {
-        String url = buildURL(start, destination, departure);
+        String url = buildURL(start, destination, departure.withNano(0));
 
         System.out.println("call URL " + url);
 
@@ -186,9 +183,9 @@ public class HereApiWrapper {
 
     private static String formatParameter(boolean firstParameter, String parameterTemplate, Object... args) {
         if (firstParameter) {
-            return "&" + String.format(parameterTemplate, args);
+            return "?" + String.format(parameterTemplate, args);
         }
-        return "?" + String.format(parameterTemplate, args);
+        return "&" + String.format(parameterTemplate, args);
     }
 
     private OkHttpClient getHTTPClient() {
