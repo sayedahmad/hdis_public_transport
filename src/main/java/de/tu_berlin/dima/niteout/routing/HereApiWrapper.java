@@ -1,15 +1,19 @@
 package de.tu_berlin.dima.niteout.routing;
 
 import de.tu_berlin.dima.niteout.routing.model.Location;
+import de.tu_berlin.dima.niteout.routing.model.Route;
 import de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry;
 import de.tu_berlin.dima.niteout.routing.model.mapzen.Units;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.commons.validator.routines.UrlValidator;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.stream.JsonParsingException;
+import javax.naming.OperationNotSupportedException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -63,6 +67,43 @@ public class HereApiWrapper {
         this.apiCode = apiCode;
     }
 
+
+    public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure) {
+
+        Reader response = null;
+        try {
+            response = getHTTPResponse(start, destination, departure);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        JsonObject json = null;
+
+        try {
+            json = Json.createReader(response).readObject();
+        } catch (JsonParsingException e) {
+            System.out.println(LocalDateTime.now() + ":: getTime fail     #" + start + ":" + destination + "\t " +
+                    e.getMessage());
+        }
+
+        assert json != null;
+        // only get first RouteSummary as it will not return alternatives TODO is this really the case?
+        JsonObject routeSummary = json
+                .getJsonObject("response")
+                .getJsonArray("route")
+                .getJsonObject(0)
+                .getJsonObject("summary");
+
+        int distance = routeSummary.getInt("distance");
+        int time = routeSummary.getInt("baseTime");
+
+        return time;
+    }
+
+    public Route getPublicTransportDirections(Location start, Location destination, LocalDateTime startTime) {
+       throw new NotImplementedException();
+    }
+
+
     public List<TimeMatrixEntry> getMultiModalMatrix(Location[] startLocations, Location[] destinationLocations,
                                                      LocalDateTime departure) {
 
@@ -94,6 +135,7 @@ public class HereApiWrapper {
             System.out.println(LocalDateTime.now() + ":: fail     #" + fromIndex + ":" + toIndex + "\t " + e.getClass().getSimpleName());
         }
 
+        assert json != null;
         // only get first RouteSummary as it will not return alternatives TODO is this really the case?
         JsonObject routeSummary = json
                 .getJsonObject("response")
@@ -109,6 +151,11 @@ public class HereApiWrapper {
 
     private Reader getHTTPResponse(Location start, Location destination, LocalDateTime departure) throws IOException {
         String url = buildURL(start, destination, departure);
+
+        System.out.println("call URL " + url);
+
+        UrlValidator urlValidator = new UrlValidator();
+        assert urlValidator.isValid(url);
 
         Request request = new Request.Builder()
                 .url(url)
