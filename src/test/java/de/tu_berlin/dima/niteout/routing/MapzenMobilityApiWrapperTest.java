@@ -24,7 +24,7 @@ public class MapzenMobilityApiWrapperTest {
             tripDuration = fixture.getWalkingTripTime(LocationDirectory.TU_BERLIN, LocationDirectory.HAUPTBAHNHOF);
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail();
+            Assert.fail(e.getMessage());
         }
 
         Assert.assertNotEquals(tripDuration, -1);
@@ -43,7 +43,7 @@ public class MapzenMobilityApiWrapperTest {
                     LocalDateTime.now());
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail();
+            Assert.fail(e.getMessage());
         }
 
         Assert.assertNotEquals(tripDuration, -1);

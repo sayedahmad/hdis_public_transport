@@ -70,15 +70,10 @@ public class RoutingService implements RoutingAPI {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    private RouteSummary getWalkingRouteSummary(Location start, Location destination) throws IOException {
+    private RouteSummary getWalkingRouteSummary(Location start, Location destination, LocalDateTime startTime) throws IOException {
 
         MapzenApiWrapper apiWrapper = new MapzenApiWrapper(System.getProperty("API_KEY_MAPZEN"));
-        RouteSummary routeSummary = new RouteSummary();
-        int tripTime = apiWrapper.getWalkingTripTime(start, destination);
-        routeSummary.setTotalDuration(tripTime);
-        HashMap<TransportMode, Integer> hashMap = new HashMap<>(1);
-        hashMap.put(TransportMode.WALKING, tripTime);
-        routeSummary.setModeOfTransportTravelTimes(hashMap);
+        RouteSummary routeSummary = apiWrapper.getWalkingRouteSummary(start, destination, startTime);
 
         return routeSummary;
     }
@@ -106,7 +101,7 @@ public class RoutingService implements RoutingAPI {
                 return this.getPublicTransportRouteSummary(startLocation, destinationLocation, startTime);
 
             case WALKING:
-                return this.getWalkingRouteSummary(startLocation, destinationLocation);
+                return this.getWalkingRouteSummary(startLocation, destinationLocation, startTime);
 
             default:
                 throw new IllegalArgumentException("transportMode");
