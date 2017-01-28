@@ -1,11 +1,11 @@
 package de.tu_berlin.dima.niteout.routing;
 
-import de.tu_berlin.dima.niteout.routing.model.Location;
-import de.tu_berlin.dima.niteout.routing.model.Route;
-import de.tu_berlin.dima.niteout.routing.model.RouteSummary;
+import de.tu_berlin.dima.niteout.routing.model.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Service to process routing requests.
@@ -24,8 +24,8 @@ public class RoutingService implements RoutingAPI {
      * @param startTime The time at which the journey will begin
      * @return The total travel time in seconds
      */
-    @Override
-    public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime startTime) {
+
+    private int getPublicTransportTripTime(Location start, Location destination, LocalDateTime startTime) {
         // TODO implement
         throw new UnsupportedOperationException("Not yet implemented");
     }
@@ -36,10 +36,10 @@ public class RoutingService implements RoutingAPI {
      * @param destination The destination location
      * @return The travel time in seconds
      */
-    @Override
-    public int getWalkingTripTime(Location start, Location destination) {
-        // TODO implement
-        throw new UnsupportedOperationException("Not yet implemented");
+    private int getWalkingTripTime(Location start, Location destination) throws IOException {
+
+        MapzenApiWrapper apiWrapper = new MapzenApiWrapper(System.getProperty("API_KEYS_MAPZEN"));
+        return apiWrapper.getWalkingTripTime(start, destination);
     }
 
     /**
@@ -49,8 +49,7 @@ public class RoutingService implements RoutingAPI {
      * @param startTime The time at which the journey will begin
      * @return The Route containing the directions
      */
-    @Override
-    public Route getPublicTransportDirections(Location start, Location destination, LocalDateTime startTime) {
+    private Route getPublicTransportDirections(Location start, Location destination, LocalDateTime startTime) {
         // TODO implement
         throw new UnsupportedOperationException("Not yet implemented");
     }
@@ -61,22 +60,74 @@ public class RoutingService implements RoutingAPI {
      * @param destination The destination location
      * @return The Route containing the directions
      */
-    @Override
-    public Route getWalkingDirections(Location start, Location destination) {
+    private Route getWalkingDirections(Location start, Location destination) {
         // TODO implement
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    @Override
-    public RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime) {
+    private RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime) {
         // TODO implement
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    @Override
-    public RouteSummary getWalkingRouteSummary(Location start, Location destination, LocalDateTime startTime) throws IOException {
+    private RouteSummary getWalkingRouteSummary(Location start, Location destination) throws IOException {
 
-        MapzenApiWrapper mapzenApi = new MapzenApiWrapper(System.getProperty("API_KEY_MAPZEN"));
-        return mapzenApi.getWalkingRouteSummary(start, destination, startTime);
+        MapzenApiWrapper apiWrapper = new MapzenApiWrapper(System.getProperty("API_KEYS_MAPZEN"));
+        RouteSummary routeSummary = new RouteSummary();
+        int tripTime = apiWrapper.getWalkingTripTime(start, destination);
+        routeSummary.setTotalDuration(tripTime);
+        HashMap<TransportMode, Integer> hashMap = new HashMap<>(1);
+        hashMap.put(TransportMode.WALKING, tripTime);
+        routeSummary.setModeOfTransportTravelTimes(hashMap);
+
+        return routeSummary;
+    }
+
+    @Override
+    public int getTripTime(TransportMode transportMode, Location startLocation, Location destinationLocation, LocalDateTime startTime) throws IOException {
+        switch (transportMode) {
+
+            case PUBLIC_TRANSPORT:
+                return this.getPublicTransportTripTime(startLocation, destinationLocation, startTime);
+
+            case WALKING:
+                return this.getWalkingTripTime(startLocation, destinationLocation);
+
+            default:
+                throw new IllegalArgumentException("transportMode");
+        }
+    }
+
+    @Override
+    public RouteSummary getRouteSummary(TransportMode transportMode, Location startLocation, Location destinationLocation, LocalDateTime startTime) throws IOException {
+        switch (transportMode) {
+
+            case PUBLIC_TRANSPORT:
+                return this.getPublicTransportRouteSummary(startLocation, destinationLocation, startTime);
+
+            case WALKING:
+                return this.getWalkingRouteSummary(startLocation, destinationLocation);
+
+            default:
+                throw new IllegalArgumentException("transportMode");
+        }
+    }
+
+    @Override
+    public List<TimeMatrixEntry> getMatrix(TransportMode transportMode, Location[] startLocations, Location[] destinationLocations, LocalDateTime startTime) throws IOException {
+
+        switch (transportMode) {
+
+            case PUBLIC_TRANSPORT:
+                // TODO implement
+                throw new UnsupportedOperationException("Not yet implemented");
+
+            case WALKING:
+                MapzenApiWrapper wrapper = new MapzenApiWrapper(System.getProperty("API_KEYS_MAPZEN"));
+                return wrapper.getWalkingMatrix(startLocations, destinationLocations);
+
+            default:
+                throw new IllegalArgumentException("transportMode");
+        }
     }
 }

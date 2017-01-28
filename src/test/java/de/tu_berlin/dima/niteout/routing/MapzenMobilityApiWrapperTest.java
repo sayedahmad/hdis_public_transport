@@ -7,9 +7,9 @@ import org.junit.Test;
 import java.time.LocalDateTime;
 
 /**
- * Test class for {@link MapzenApiWrapper}.
+ * Test class for {@link MapzenMobilityApiWrapper}.
  */
-public class MapzenApiWrapperTest {
+public class MapzenMobilityApiWrapperTest {
 
     private final String apiKey = System.getProperty("API_KEY_MAPZEN");
 
@@ -17,7 +17,7 @@ public class MapzenApiWrapperTest {
     @Test
     public void getWalkingTripTime() {
 
-        MapzenApiWrapper fixture = new MapzenApiWrapper(this.apiKey);
+        MapzenMobilityApiWrapper fixture = new MapzenMobilityApiWrapper(this.apiKey);
         int tripDuration = 0;
 
         try {
@@ -33,7 +33,7 @@ public class MapzenApiWrapperTest {
     @Test
     public void getPublicTransportTripTime() {
 
-        MapzenApiWrapper fixture = new MapzenApiWrapper(this.apiKey);
+        MapzenMobilityApiWrapper fixture = new MapzenMobilityApiWrapper(this.apiKey);
         int tripDuration = 0;
 
         try {
