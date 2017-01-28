@@ -38,7 +38,7 @@ public class RoutingService implements RoutingAPI {
      */
     private int getWalkingTripTime(Location start, Location destination) throws IOException {
 
-        MapzenApiWrapper apiWrapper = new MapzenApiWrapper(System.getProperty("API_KEYS_MAPZEN"));
+        MapzenApiWrapper apiWrapper = new MapzenApiWrapper(System.getProperty("API_KEY_MAPZEN"));
         return apiWrapper.getWalkingTripTime(start, destination);
     }
 
@@ -72,7 +72,7 @@ public class RoutingService implements RoutingAPI {
 
     private RouteSummary getWalkingRouteSummary(Location start, Location destination) throws IOException {
 
-        MapzenApiWrapper apiWrapper = new MapzenApiWrapper(System.getProperty("API_KEYS_MAPZEN"));
+        MapzenApiWrapper apiWrapper = new MapzenApiWrapper(System.getProperty("API_KEY_MAPZEN"));
         RouteSummary routeSummary = new RouteSummary();
         int tripTime = apiWrapper.getWalkingTripTime(start, destination);
         routeSummary.setTotalDuration(tripTime);
@@ -123,7 +123,7 @@ public class RoutingService implements RoutingAPI {
                 throw new UnsupportedOperationException("Not yet implemented");
 
             case WALKING:
-                MapzenApiWrapper wrapper = new MapzenApiWrapper(System.getProperty("API_KEYS_MAPZEN"));
+                MapzenApiWrapper wrapper = new MapzenApiWrapper(System.getProperty("API_KEY_MAPZEN"));
                 return wrapper.getWalkingMatrix(startLocations, destinationLocations);
 
             default:
