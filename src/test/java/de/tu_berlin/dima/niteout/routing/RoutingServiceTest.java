@@ -1,6 +1,7 @@
 package de.tu_berlin.dima.niteout.routing;
 
 import de.tu_berlin.dima.niteout.routing.model.RouteSummary;
+import de.tu_berlin.dima.niteout.routing.model.TransportMode;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,8 +33,10 @@ public class RoutingServiceTest {
         LocalDateTime now = LocalDateTime.now();
 
         try {
-            RouteSummary routeSummary = fixture.getWalkingRouteSummary(
-                    LocationDirectory.TU_BERLIN, LocationDirectory.POTSDAMER_PLATZ, LocalDateTime.now());
+            RouteSummary routeSummary = fixture.getRouteSummary(
+                    TransportMode.WALKING,
+                    LocationDirectory.TU_BERLIN, LocationDirectory.POTSDAMER_PLATZ,
+                    LocalDateTime.now());
             Assert.assertNotNull(routeSummary);
             Assert.assertNotEquals(0, routeSummary.getTotalDuration());
             Assert.assertNotEquals(0, routeSummary.getTotalDistance());
