@@ -2,6 +2,7 @@ package de.tu_berlin.dima.niteout.routing;
 
 import de.tu_berlin.dima.niteout.routing.model.Location;
 import de.tu_berlin.dima.niteout.routing.model.Route;
+import de.tu_berlin.dima.niteout.routing.model.RouteSummary;
 
 import java.time.LocalDateTime;
 
@@ -61,6 +62,18 @@ public class RoutingService implements RoutingAPI {
      */
     @Override
     public Route getWalkingDirections(Location start, Location destination) {
+        // TODO implement
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime) {
+        // TODO implement
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public RouteSummary getWalkingRouteSummary(Location start, Location destination) {
         // TODO implement
         throw new UnsupportedOperationException("Not yet implemented");
     }

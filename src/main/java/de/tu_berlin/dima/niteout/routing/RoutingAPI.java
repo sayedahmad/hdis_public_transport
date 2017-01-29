@@ -2,6 +2,7 @@ package de.tu_berlin.dima.niteout.routing;
 
 import de.tu_berlin.dima.niteout.routing.model.Location;
 import de.tu_berlin.dima.niteout.routing.model.Route;
+import de.tu_berlin.dima.niteout.routing.model.RouteSummary;
 
 import java.time.LocalDateTime;
 
@@ -16,4 +17,8 @@ public interface RoutingAPI {
     Route getPublicTransportDirections(Location start, Location destination, LocalDateTime startTime);
 
     Route getWalkingDirections(Location start, Location destination);
+
+    RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime);
+
+    RouteSummary getWalkingRouteSummary(Location start, Location destination);
 }

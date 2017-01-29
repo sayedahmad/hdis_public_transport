@@ -1,5 +1,5 @@
 group 'de.tu_berlin.dima.niteout'
-version '1.0-SNAPSHOT'
+version '0.1'
 
 apply plugin: 'java'
 
@@ -10,4 +10,10 @@ repositories {
 dependencies {
     compile 'org.glassfish:javax.json:1.0.4'
     testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+task deliverableJar(type: Jar) {
+    baseName = project.name + '-inclibs'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
