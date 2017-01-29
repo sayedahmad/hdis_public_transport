@@ -1,5 +1,6 @@
 package de.tu_berlin.dima.niteout.routing;
 
+import de.tu_berlin.dima.niteout.routing.model.Location;
 import de.tu_berlin.dima.niteout.routing.model.RouteSummary;
 import de.tu_berlin.dima.niteout.routing.model.TransportMode;
 import org.junit.Assert;
@@ -24,6 +25,20 @@ public class RoutingServiceTest {
 //        RoutingService service = new RoutingService();
 //        assertNotNull(service.getEmptyRoute());
 //        assertEquals("No route found", service.getEmptyRoute());
+    }
+
+    @Test
+    public void testGetWalkingTripTime() {
+        RoutingService fixture = new RoutingService();
+        int tripTime = 0;
+        try {
+            tripTime = fixture.getTripTime(TransportMode.WALKING,
+                    LocationDirectory.TU_BERLIN, LocationDirectory.SIEGESSAEULE,
+                    LocalDateTime.now());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Assert.assertTrue(tripTime > 0);
     }
 
     @Test

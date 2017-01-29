@@ -11,6 +11,7 @@ import okhttp3.Response;
 
 import javax.json.*;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,32 +19,34 @@ import java.util.List;
 /**
  * Created by aardila on 1/22/2017.
  */
-class MapzenMatrixApiWrapper {
+class MapzenMatrixApiWrapper extends MapzenApi {
 
-    private final String apiKey;
-    private final String urlFormat = "https://matrix.mapzen.com/%s?json=%s&api_key=%s";
-    private OkHttpClient httpClient;
+    //private final String apiKey;
+    //private final String urlFormat = "https://matrix.mapzen.com/%s?json=%s&api_key=%s";
+    //private OkHttpClient httpClient;
     private final Units DistanceUnits = Units.KM;
 
     public MapzenMatrixApiWrapper(String apiKey) {
 
+        super("matrix", apiKey);
+
         if (apiKey == null || apiKey.trim().length() == 0)
             throw new IllegalArgumentException("apiKey cannot be null or empty");
 
-        this.apiKey = apiKey;
-        this.httpClient = new OkHttpClient();
+//        this.apiKey = apiKey;
+//        this.httpClient = new OkHttpClient();
     }
 
-    private JsonObject getResponse(MatrixType matrixType, JsonObject jsonObject) throws IOException {
-        String url = String.format(this.urlFormat, matrixType.getApiString(), jsonObject, this.apiKey);
-        Request request = new Request.Builder().url(url).build();
-
-        Response response = this.httpClient.newCall(request).execute();
-
-        JsonReader jsonReader = Json.createReader(response.body().charStream());
-
-        return jsonReader.readObject();
-    }
+//    private JsonObject getResponse(MatrixType matrixType, JsonObject jsonObject) throws IOException {
+//        String url = String.format(this.urlFormat, matrixType.getApiString(), jsonObject, this.apiKey);
+//        Request request = new Request.Builder().url(url).build();
+//
+//        Response response = this.httpClient.newCall(request).execute();
+//
+//        JsonReader jsonReader = Json.createReader(response.body().charStream());
+//
+//        return jsonReader.readObject();
+//    }
 
     /**
      * Gets a one-to-many time matrix between the starting location and all destinations
@@ -59,7 +62,13 @@ class MapzenMatrixApiWrapper {
         jsonBuilder.addLocations(destinations);
         JsonObject requestJsonObject = jsonBuilder.build(this.DistanceUnits);
 
-        JsonObject response = this.getResponse(MatrixType.ONE_TO_MANY, requestJsonObject);
+        JsonObject response = null;
+        try {
+            response = super.getResponse(MatrixType.ONE_TO_MANY.getApiString(), requestJsonObject);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            //TODO
+        }
         //TODO check for error(s) in response
         String units = response.getString("units");
         JsonArray outerArray = response.getJsonArray(MatrixType.ONE_TO_MANY.getApiString());
@@ -94,7 +103,13 @@ class MapzenMatrixApiWrapper {
         jsonBuilder.addLocation(destinationLocation);
         JsonObject requestJsonObject = jsonBuilder.build(this.DistanceUnits);
 
-        JsonObject response = this.getResponse(MatrixType.MANY_TO_ONE, requestJsonObject);
+        JsonObject response = null;
+        try {
+            response = this.getResponse(MatrixType.MANY_TO_ONE.getApiString(), requestJsonObject);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            //TODO
+        }
         //TODO check for error(s) in response
         String units = response.getString("units");
 
@@ -135,7 +150,13 @@ class MapzenMatrixApiWrapper {
                 .add("units", this.DistanceUnits.getApiString())
                 .build();
 
-        JsonObject response = this.getResponse(MatrixType.SOURCES_TO_TARGETS, requestJsonObject);
+        JsonObject response = null;
+        try {
+            response = this.getResponse(MatrixType.SOURCES_TO_TARGETS.getApiString(), requestJsonObject);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            //TODO
+        }
         //TODO check for error(s) in response
         String units = response.getString("units");
         JsonArray outerArray = response.getJsonArray(MatrixType.SOURCES_TO_TARGETS.getApiString());
@@ -171,7 +192,14 @@ class MapzenMatrixApiWrapper {
         jsonBuilder.addLocations(locations);
         JsonObject requestJsonObject = jsonBuilder.build(this.DistanceUnits);
 
-        JsonObject response = this.getResponse(MatrixType.MANY_TO_MANY, requestJsonObject);
+        JsonObject response = null;
+        try {
+            response = this.getResponse(MatrixType.MANY_TO_MANY.getApiString(), requestJsonObject);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            //TODO
+        }
+
         //TODO check for error(s) in response
         String units = response.getString("units");
 

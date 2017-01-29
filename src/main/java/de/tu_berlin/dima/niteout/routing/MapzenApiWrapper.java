@@ -23,7 +23,8 @@ class MapzenApiWrapper {
         return getWalkingTripTime(start, destination, null);
     }
 
-    public int getWalkingTripTime(Location start, Location destination, LocalDateTime departureTime) throws IOException {
+    public int getWalkingTripTime(Location start, Location destination,
+                                  LocalDateTime departureTime) throws IOException {
         MapzenMobilityApiWrapper mobilityWrapper = new MapzenMobilityApiWrapper(apiKey);
         return departureTime == null ?
                 mobilityWrapper.getWalkingTripTime(start, destination) :
@@ -34,14 +35,16 @@ class MapzenApiWrapper {
         return getWalkingRouteSummary(start, destination, null);
     }
 
-    public RouteSummary getWalkingRouteSummary(Location start, Location destination, LocalDateTime departureTime) throws IOException {
+    public RouteSummary getWalkingRouteSummary(Location start, Location destination,
+                                               LocalDateTime departureTime) throws IOException {
         MapzenMobilityApiWrapper mobilityWrapper = new MapzenMobilityApiWrapper(apiKey);
         return departureTime == null ?
                 mobilityWrapper.getWalkingRouteSummary(start, destination) :
                 mobilityWrapper.getWalkingRouteSummary(start, destination, departureTime);
     }
 
-    public List<TimeMatrixEntry> getWalkingMatrix(Location[] startLocations, Location[] destinationLocations) throws IOException {
+    public List<TimeMatrixEntry> getWalkingMatrix(Location[] startLocations,
+                                                  Location[] destinationLocations) throws IOException {
 
         MapzenMatrixApiWrapper matrixWrapper = new MapzenMatrixApiWrapper(this.apiKey);
         return matrixWrapper.getWalkingMatrix(startLocations, destinationLocations);

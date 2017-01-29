@@ -15,4 +15,11 @@ public class BoundingBox {
         this.MaxX = maxX;
         this.MaxY = maxY;
     }
+
+    public boolean contains(Location location) {
+        return
+                (location.getLatitude() >= MinY && location.getLatitude() <= MaxY)
+                &&
+                (location.getLongitude() >= MinX && location.getLongitude() <= MaxX);
+    }
 }
