@@ -7,8 +7,8 @@ public class TimeMatrixEntry {
     private int fromIndex;
     private int toIndex;
     private int time;
-    public double distance;
-    public String units;
+    private double distance;
+    private String units;
 
     public TimeMatrixEntry(int fromIndex, int toIndex, int time, double distance, String units) {
         this.fromIndex = fromIndex;
