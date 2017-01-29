@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by aardila on 1/26/2017.
  */
-class MapzenApiWrapper {
+class MapzenApiWrapper implements WalkingDirectionsAPI {
 
     private final String apiKey;
 
@@ -19,10 +19,12 @@ class MapzenApiWrapper {
         this.apiKey = apiKey;
     }
 
+    @Override
     public int getWalkingTripTime(Location start, Location destination) throws IOException {
         return getWalkingTripTime(start, destination, null);
     }
 
+    @Override
     public int getWalkingTripTime(Location start, Location destination,
                                   LocalDateTime departureTime) throws IOException {
         MapzenMobilityApiWrapper mobilityWrapper = new MapzenMobilityApiWrapper(apiKey);
@@ -31,10 +33,12 @@ class MapzenApiWrapper {
                 mobilityWrapper.getWalkingTripTime(start, destination, departureTime);
     }
 
+    @Override
     public RouteSummary getWalkingRouteSummary(Location start, Location destination) throws IOException {
         return getWalkingRouteSummary(start, destination, null);
     }
 
+    @Override
     public RouteSummary getWalkingRouteSummary(Location start, Location destination,
                                                LocalDateTime departureTime) throws IOException {
         MapzenMobilityApiWrapper mobilityWrapper = new MapzenMobilityApiWrapper(apiKey);
@@ -43,6 +47,7 @@ class MapzenApiWrapper {
                 mobilityWrapper.getWalkingRouteSummary(start, destination, departureTime);
     }
 
+    @Override
     public List<TimeMatrixEntry> getWalkingMatrix(Location[] startLocations,
                                                   Location[] destinationLocations) throws IOException {
 
