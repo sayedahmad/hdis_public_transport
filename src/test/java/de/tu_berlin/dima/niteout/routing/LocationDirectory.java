@@ -34,4 +34,11 @@ public final class LocationDirectory {
             ThreadLocalRandom.current().nextDouble(BERLIN_BOUNDING_BOX.MinX, BERLIN_BOUNDING_BOX.MaxX)
         );
     }
+
+    public static Location getRandomLocation(BoundingBox boundingBox) {
+        return new Location(
+                ThreadLocalRandom.current().nextDouble(boundingBox.MinY, boundingBox.MaxY),
+                ThreadLocalRandom.current().nextDouble(boundingBox.MinX, boundingBox.MaxX)
+        );
+    }
 }
