@@ -152,6 +152,84 @@ public class HereApiWrapper {
     }
 
 
+    public RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime departure) {
+        Reader responseReader = null;
+        try {
+            responseReader = getHTTPResponse(start, destination, departure);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        JsonObject json = null;
+
+        try {
+            json = Json.createReader(responseReader).readObject();
+        } catch (JsonParsingException e) {
+            System.out.println(LocalDateTime.now() + ":: fail getPublicTransportDirections: " + e.getMessage());
+        }
+
+        return getRouteSummaryFromJsonResponse(json);
+
+    }
+
+    private RouteSummary getRouteSummaryFromJsonResponse(JsonObject json) {
+        assert json != null;
+
+        JsonObject route = json
+                .getJsonObject("response")
+                .getJsonArray("route")
+                .getJsonObject(0);
+
+        // travel times for modes: route/leg[]/maneuver{_type,traveltime}
+        JsonArray legs = route.getJsonArray("leg");
+
+        int publicTransportTravelTime = 0,
+                walkingTravelTime = 0;
+
+        for (int i = 0; i < legs.size(); i++) {
+            JsonArray maneuvers = legs.getJsonObject(i).getJsonArray("maneuver");
+            for (int j = 0; j < maneuvers.size(); j++) {
+                JsonObject maneuver = maneuvers.getJsonObject(j);
+                String type = maneuver.getJsonString("_type").getString();
+                int travelTime = maneuver.getInt("travelTime");
+                switch (type) {
+                    case "PrivateTransportManeuverType":
+                        walkingTravelTime += travelTime;
+                        break;
+                    case "PublicTransportManeuverType":
+                        publicTransportTravelTime += travelTime;
+                        break;
+                    default:
+                        throw new IllegalStateException("Cannot handle transport type: " + type);
+                }
+            }
+        }
+
+        HashMap<TransportMode, Integer> modeOfTransportTravelTimes = new HashMap<>();
+        modeOfTransportTravelTimes.put(TransportMode.PUBLIC_TRANSPORT, publicTransportTravelTime);
+        modeOfTransportTravelTimes.put(TransportMode.WALKING, walkingTravelTime);
+
+        // total duration: route/summary/travelTime
+        int duration = route.getJsonObject("summary").getInt("travelTime");
+
+        // departure: route/summary/departure
+        String departureAsISOString = route.getJsonObject("summary").getString("departure");
+        LocalDateTime departure = LocalDateTime.parse(departureAsISOString, ISO_OFFSET_DATE_TIME);
+
+        // arrival: departure + travelTime
+        LocalDateTime arrival = departure.plus(Duration.ofSeconds(duration));
+
+        // number of changes: route/publicTransportLine -1
+        int numberOfChanges = route.getJsonArray("publicTransportLine").size() - 1;
+
+        RouteSummary routeSummary = new RouteSummary();
+        routeSummary.setArrivalTime(arrival);
+        routeSummary.setDepartureTime(departure);
+        routeSummary.setNumberOfChanges(numberOfChanges);
+        routeSummary.setTotalDuration(duration);
+        routeSummary.setModeOfTransportTravelTimes(modeOfTransportTravelTimes);
+        return routeSummary;
+
+    }
 
     private Reader getHTTPResponse(Location start, Location destination, LocalDateTime departure) throws IOException {
         String url = buildURL(start, destination, departure.withNano(0));

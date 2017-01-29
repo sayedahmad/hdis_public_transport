@@ -1,8 +1,6 @@
 package de.tu_berlin.dima.niteout.routing;
 
-import de.tu_berlin.dima.niteout.routing.model.BoundingBox;
-import de.tu_berlin.dima.niteout.routing.model.Location;
-import de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry;
+import de.tu_berlin.dima.niteout.routing.model.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +11,7 @@ import java.util.List;
 import static de.tu_berlin.dima.niteout.routing.LocationDirectory.ALEXANDERPLATZ;
 import static de.tu_berlin.dima.niteout.routing.LocationDirectory.BRANDENBURGER_TOR;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class HereApiWrapperTest {
@@ -54,5 +53,12 @@ public class HereApiWrapperTest {
             array[i] = filler;
         }
         return array;
+    }
+
+    @Test
+    public void getPublicTransportRouteSummaryTest() {
+        RouteSummary routeSummary = api.getPublicTransportRouteSummary(BRANDENBURGER_TOR, ALEXANDERPLATZ,
+                LocalDateTime.now());
+        assertNotNull(routeSummary);
     }
 }
