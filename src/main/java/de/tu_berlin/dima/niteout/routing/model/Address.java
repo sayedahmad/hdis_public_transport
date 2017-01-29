@@ -40,17 +40,17 @@ public class Address {
         private int postalCode;
 
         public AddressBuilder houseNumber(String houseNumber) {
-            this.houseNumber = houseNumber;
+            this.houseNumber = houseNumber.trim();
             return this;
         }
 
         public AddressBuilder street(String street) {
-            this.street = street;
+            this.street = street.trim();
             return this;
         }
 
         public AddressBuilder city(String city) {
-            this.street = street;
+            this.street = street.trim();
             return this;
         }
 
