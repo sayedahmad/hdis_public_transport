@@ -17,3 +17,14 @@ task deliverableJar(type: Jar) {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
+
+test.doFirst {
+    // load all keys
+    def Properties props = new Properties()
+    props.load(new FileInputStream(new File('api-keys.properties')))
+    props.propertyNames().each { keyname ->
+        systemProperty keyname, props.getProperty(keyname)
+    }
+}
+
+
