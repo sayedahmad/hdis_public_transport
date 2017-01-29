@@ -4,7 +4,6 @@ import de.tu_berlin.dima.niteout.routing.model.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -18,10 +17,32 @@ import java.util.List;
 public class RoutingService implements RoutingAPI {
     // TODO move javadocs to Interface
 
-    private static final String API_HERE_APP_ID = "API_HERE_APP_ID";
-    private static final String API_HERE_APP_CODE = "API_HERE_APP_CODE";
-    private PublicTranportAPI publicTranportAPI;
+    private static class Settings {
 
+        static final String getHereApiAppID() { return System.getProperty("API_HERE_APP_ID"); }
+        static final String getHereApiAppCode() { return System.getProperty("API_HERE_APP_CODE"); }
+        static final String getMapzenApiKey() { return System.getProperty("API_KEY_MAPZEN"); }
+    }
+
+
+    private PublicTranportAPI publicTranportAPI;
+    private WalkingDirectionsAPI walkingDirectionsAPI;
+
+    // for lazy initialize
+    private PublicTranportAPI getPublicTransportAPI() {
+        if (publicTranportAPI == null) {
+            // injection - TODO discuss if we use "proper" injection
+            publicTranportAPI = new HereApiWrapper(Settings.getHereApiAppID(), Settings.getHereApiAppCode());
+        }
+        return publicTranportAPI;
+    }
+
+    private WalkingDirectionsAPI getWalkingDirectionsAPI() {
+        if (walkingDirectionsAPI == null) {
+            walkingDirectionsAPI = new MapzenApiWrapper(Settings.getMapzenApiKey());
+        }
+        return walkingDirectionsAPI;
+    }
 
     /**
      * The time in seconds to travel from one location to another via Public Transport
@@ -42,8 +63,7 @@ public class RoutingService implements RoutingAPI {
      */
     private int getWalkingTripTime(Location start, Location destination) throws IOException {
 
-        MapzenApiWrapper apiWrapper = new MapzenApiWrapper(System.getProperty("API_KEY_MAPZEN"));
-        return apiWrapper.getWalkingTripTime(start, destination);
+        return getWalkingDirectionsAPI().getWalkingTripTime(start, destination);
     }
 
     /**
@@ -75,9 +95,7 @@ public class RoutingService implements RoutingAPI {
 
     private RouteSummary getWalkingRouteSummary(Location start, Location destination, LocalDateTime startTime) throws IOException {
 
-        MapzenApiWrapper apiWrapper = new MapzenApiWrapper(System.getProperty("API_KEY_MAPZEN"));
-        RouteSummary routeSummary = apiWrapper.getWalkingRouteSummary(start, destination, startTime);
-
+        RouteSummary routeSummary = getWalkingDirectionsAPI().getWalkingRouteSummary(start, destination, startTime);
         return routeSummary;
     }
 
@@ -125,20 +143,10 @@ public class RoutingService implements RoutingAPI {
                 return this.publicTranportAPI.getMultiModalMatrix(startLocations, destinationLocations, startTime);
 
             case WALKING:
-                MapzenApiWrapper wrapper = new MapzenApiWrapper(System.getProperty("API_KEY_MAPZEN"));
-                return wrapper.getWalkingMatrix(startLocations, destinationLocations);
+                return getWalkingDirectionsAPI().getWalkingMatrix(startLocations, destinationLocations);
 
             default:
                 throw new IllegalArgumentException("transportMode");
         }
-    }
-
-    // for lazy initialize
-    private PublicTranportAPI getPublicTransportAPI() {
-        if (publicTranportAPI == null) {
-            // injection - TODO discuss if we use "proper" injection
-            publicTranportAPI = new HereApiWrapper(System.getProperty(API_HERE_APP_ID), System.getProperty(API_HERE_APP_CODE));
-        }
-        return publicTranportAPI;
     }
 }
