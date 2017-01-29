@@ -3,14 +3,11 @@ package de.tu_berlin.dima.niteout.routing;
 import de.tu_berlin.dima.niteout.routing.model.Address;
 import de.tu_berlin.dima.niteout.routing.model.Location;
 
-import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.function.Function;
 
 /**
  * Created by aardila on 1/28/2017.
