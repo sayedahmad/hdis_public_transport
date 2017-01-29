@@ -1,27 +1,26 @@
 package de.tu_berlin.dima.niteout.routing;
 
-import de.tu_berlin.dima.niteout.routing.model.Location;
-import de.tu_berlin.dima.niteout.routing.model.Route;
-import de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry;
-import de.tu_berlin.dima.niteout.routing.model.mapzen.Units;
 import com.google.common.util.concurrent.RateLimiter;
+import de.tu_berlin.dima.niteout.routing.model.*;
+import de.tu_berlin.dima.niteout.routing.model.mapzen.Units;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.apache.commons.validator.routines.UrlValidator;
 
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.stream.JsonParsingException;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.time.temporal.TemporalUnit;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.stream.IntStream;
 
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static java.util.stream.Collectors.toList;
 
 /*
@@ -68,54 +67,35 @@ public class HereApiWrapper {
         this.apiCode = apiCode;
     }
 
-    final RateLimiter rateLimiter = RateLimiter.create(MAX_API_RPS);
-//
-//    void submitRequest(Runnable task, Executor executor) {
-//        rateLimiter.acquire(); // may wait
-//        executor.execute(task);
-//    }
-//
-//    void submitRequests(List<Runnable> tasks, Executor executor) {
-//        for (Runnable task : tasks) {
-//            rateLimiter.acquire(); // may wait
-//            executor.execute(task);
-//        }
-//    }
+    final RateLimiter rateLimiter = RateLimiter.create(MAX_API_RPS); // TODO play with RPS value
 
     public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure) {
+        return getMatrixEntryForRouteArguments(0,0,start,destination,departure).getTime();
+    }
 
+    public Route getPublicTransportDirections(Location start, Location destination, LocalDateTime departure) {
         Reader responseReader = null;
         try {
             responseReader = getHTTPResponse(start, destination, departure);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         JsonObject json = null;
 
         try {
             json = Json.createReader(responseReader).readObject();
         } catch (JsonParsingException e) {
-            System.out.println(LocalDateTime.now() + ":: getTime fail     #" + start + ":" + destination + "\t " +
-                    e.getMessage());
+            System.out.println(LocalDateTime.now() + ":: fail getPublicTransportDirections: " + e.getMessage());
         }
 
         assert json != null;
-        // only get first RouteSummary as it will not return alternatives TODO is this really the case?
-        JsonObject routeSummary = json
-                .getJsonObject("response")
-                .getJsonArray("route")
-                .getJsonObject(0)
-                .getJsonObject("summary");
 
-        int distance = routeSummary.getInt("distance");
-        int time = routeSummary.getInt("baseTime");
+        Route route = new Route();
 
-        return time;
-    }
+        // TODO does this have to be implemented?
+        //route.setSegments(json);
 
-    public Route getPublicTransportDirections(Location start, Location destination, LocalDateTime startTime) {
-       throw new UnsupportedOperationException("Not yet implemented");
+        return route;
     }
 
     public List<TimeMatrixEntry> getMultiModalMatrix(Location[] startLocations, Location[] destinationLocations,
@@ -123,20 +103,20 @@ public class HereApiWrapper {
 
         IntStream startIndices = IntStream.range(0, startLocations.length - 1);
 
+        // Parallelize all start locations, map each of them to all destination locations and get a MatrixEntry for
+        // each combination. Then collect them again to a single list and return it.
+        // TODO check parallelism, now it just depends on startDestinations and does not scale for 1-n
         return startIndices.parallel()
                 .mapToObj(i -> IntStream.range(0, destinationLocations.length - 1)
-                        //.parallel()
                         .mapToObj(j ->
-                                getMatrixEntry(i, j, startLocations[i], destinationLocations[j], departureTime))
+                                getMatrixEntryForRouteArguments(i, j, startLocations[i], destinationLocations[j], departureTime))
                         .collect(toList()))
                 .flatMap(l -> l.stream())
                 .collect(toList());
     }
 
-    private TimeMatrixEntry getMatrixEntry(int fromIndex, int toIndex, Location start, Location destination,
-                                           LocalDateTime departure) {
-
-        final String units = Units.KM.getApiString();
+    private TimeMatrixEntry getMatrixEntryForRouteArguments(int fromIndex, int toIndex, Location start, Location destination,
+                                                            LocalDateTime departure) {
 
         System.out.println(LocalDateTime.now() + ":: request  #" + toIndex + ":" + fromIndex);
         Reader response = null;
@@ -152,28 +132,31 @@ public class HereApiWrapper {
         } catch (JsonParsingException e) {
             System.out.println(LocalDateTime.now() + ":: fail     #" + fromIndex + ":" + toIndex + "\t " + e.getClass().getSimpleName());
         }
+        return getTimeMatrixEntryFromJsonRoute(fromIndex, toIndex, json);
+    }
 
+    private TimeMatrixEntry getTimeMatrixEntryFromJsonRoute(int fromIndex, int toIndex, JsonObject json) {
         assert json != null;
         // only get first RouteSummary as it will not return alternatives TODO is this really the case?
-        JsonObject routeSummary = json
+        JsonObject jsonRouteSummary = json
                 .getJsonObject("response")
                 .getJsonArray("route")
                 .getJsonObject(0)
                 .getJsonObject("summary");
 
-        int distance = routeSummary.getInt("distance");
-        int time = routeSummary.getInt("baseTime");
+        int distance = jsonRouteSummary.getInt("distance");
+        int time = jsonRouteSummary.getInt("baseTime");
+        final String units = Units.KM.getApiString();
 
         return new TimeMatrixEntry(fromIndex, toIndex, time, distance, units);
     }
+
+
 
     private Reader getHTTPResponse(Location start, Location destination, LocalDateTime departure) throws IOException {
         String url = buildURL(start, destination, departure.withNano(0));
 
         System.out.println("call URL " + url);
-
-//        UrlValidator urlValidator = new UrlValidator();
-//        assert urlValidator.isValid(url);
 
         Request request = new Request.Builder()
                 .url(url)
@@ -207,34 +190,11 @@ public class HereApiWrapper {
         return (firstParameter ? "?" : "&") + String.format(parameterTemplate, args);
     }
 
+    // lazy init
     private OkHttpClient getHTTPClient() {
         if (httpClient == null) {
             this.httpClient = new OkHttpClient();
         }
         return httpClient;
-    }
-
-    private String readerToString(Reader reader) {
-        BufferedReader br = null;
-        StringBuilder sb = new StringBuilder();
-        String line;
-        try {
-            br = new BufferedReader(reader);
-            while ((line = br.readLine()) != null) {
-                sb.append(line).append("add");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            // always true
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return sb.toString();
     }
 }
