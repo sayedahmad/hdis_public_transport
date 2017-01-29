@@ -82,7 +82,9 @@ public class RoutingService implements RoutingAPI {
     }
 
     @Override
-    public int getTripTime(TransportMode transportMode, Location startLocation, Location destinationLocation, LocalDateTime startTime) throws IOException {
+    public int getTripTime(TransportMode transportMode,
+                           Location startLocation, Location destinationLocation,
+                           LocalDateTime startTime) throws IOException {
         switch (transportMode) {
 
             case PUBLIC_TRANSPORT:
@@ -97,7 +99,9 @@ public class RoutingService implements RoutingAPI {
     }
 
     @Override
-    public RouteSummary getRouteSummary(TransportMode transportMode, Location startLocation, Location destinationLocation, LocalDateTime startTime) throws IOException {
+    public RouteSummary getRouteSummary(TransportMode transportMode,
+                                        Location startLocation, Location destinationLocation,
+                                        LocalDateTime startTime) throws IOException {
         switch (transportMode) {
 
             case PUBLIC_TRANSPORT:
@@ -112,13 +116,13 @@ public class RoutingService implements RoutingAPI {
     }
 
     @Override
-    public List<TimeMatrixEntry> getMatrix(TransportMode transportMode, Location[] startLocations, Location[] destinationLocations, LocalDateTime startTime) throws IOException {
-
+    public List<TimeMatrixEntry> getMatrix(TransportMode transportMode,
+                                           Location[] startLocations, Location[] destinationLocations,
+                                           LocalDateTime startTime) throws IOException {
         switch (transportMode) {
 
             case PUBLIC_TRANSPORT:
-                // TODO implement
-                throw new UnsupportedOperationException("Not yet implemented");
+                return this.publicTranportAPI.getMultiModalMatrix(startLocations, destinationLocations, startTime);
 
             case WALKING:
                 MapzenApiWrapper wrapper = new MapzenApiWrapper(System.getProperty("API_KEY_MAPZEN"));
