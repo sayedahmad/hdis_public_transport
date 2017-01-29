@@ -11,6 +11,7 @@ public class RouteSummary {
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
     private int totalDuration;
+    private double totalDistance;
     private HashMap<TransportMode, Integer> modeOfTransportTravelTimes;
     private int numberOfChanges;
 
@@ -30,6 +31,10 @@ public class RouteSummary {
     public void setTotalDuration(int totalDuration) {
         this.totalDuration = totalDuration;
     }
+
+    public double getTotalDistance() { return totalDistance; }
+
+    public void setTotalDistance(double totalDistance) { this.totalDistance = totalDistance; }
 
     public HashMap<TransportMode, Integer> getModeOfTransportTravelTimes() {
         return modeOfTransportTravelTimes;
