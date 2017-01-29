@@ -10,7 +10,6 @@ import java.util.List;
 public interface RoutingAPI {
 
     //int getPublicTransportTripTime(Location start, Location destination, LocalDateTime startTime);
-
     //int getWalkingTripTime(Location start, Location destination) throws IOException;
 
     int getTripTime(TransportMode transportMode,
@@ -22,7 +21,6 @@ public interface RoutingAPI {
     //Route getWalkingDirections(Location start, Location destination);
 
     //RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime);
-
     //RouteSummary getWalkingRouteSummary(Location start, Location destination);
 
     RouteSummary getRouteSummary(TransportMode transportMode,
