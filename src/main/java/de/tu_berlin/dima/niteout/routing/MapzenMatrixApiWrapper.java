@@ -21,9 +21,6 @@ import java.util.List;
  */
 class MapzenMatrixApiWrapper extends MapzenApi {
 
-    //private final String apiKey;
-    //private final String urlFormat = "https://matrix.mapzen.com/%s?json=%s&api_key=%s";
-    //private OkHttpClient httpClient;
     private final Units DistanceUnits = Units.KM;
 
     public MapzenMatrixApiWrapper(String apiKey) {
@@ -32,21 +29,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
 
         if (apiKey == null || apiKey.trim().length() == 0)
             throw new IllegalArgumentException("apiKey cannot be null or empty");
-
-//        this.apiKey = apiKey;
-//        this.httpClient = new OkHttpClient();
     }
-
-//    private JsonObject getResponse(MatrixType matrixType, JsonObject jsonObject) throws IOException {
-//        String url = String.format(this.urlFormat, matrixType.getApiString(), jsonObject, this.apiKey);
-//        Request request = new Request.Builder().url(url).build();
-//
-//        Response response = this.httpClient.newCall(request).execute();
-//
-//        JsonReader jsonReader = Json.createReader(response.body().charStream());
-//
-//        return jsonReader.readObject();
-//    }
 
     /**
      * Gets a one-to-many time matrix between the starting location and all destinations

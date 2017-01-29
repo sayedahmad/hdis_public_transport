@@ -18,12 +18,8 @@ import javax.json.*;
 
 class MapzenMobilityApiWrapper extends MapzenApi {
 
-//    private final String apiKey;
-//    private final String uriFormat = "https://valhalla.mapzen.com/route?json=%s&api_key=%s";
-
     private static final DateTimeFormatter ISO8601_DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("YYYY-MM-DD'T'HH:mm");
-
 
     public MapzenMobilityApiWrapper(String apiKey) {
 
@@ -31,8 +27,6 @@ class MapzenMobilityApiWrapper extends MapzenApi {
 
         if (apiKey == null || apiKey.trim().length() == 0)
             throw new IllegalArgumentException("apiKey cannot be null or empty");
-
-//        this.apiKey = apiKey;
     }
 
     public int getWalkingTripTime(Location start, Location destination) throws IOException {

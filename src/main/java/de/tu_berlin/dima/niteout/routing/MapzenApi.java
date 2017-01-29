@@ -20,7 +20,6 @@ abstract class MapzenApi {
 
     protected final String apiKey;
     protected final String service;
-    //private final String urlFormat = "https://%s.mapzen.com/%s?json=%s&api_key=%s";
     private final String urlFormat = "https://%s.mapzen.com/%s";
 
     protected MapzenApi(String service, String apiKey) {
@@ -58,7 +57,6 @@ abstract class MapzenApi {
         queryString.put("json", jsonObject.toString());
         queryString.put("api_key", this.apiKey);
         return getUrl(endpoint, queryString);
-        //return String.format(urlFormat, service, endpoint, jsonObject, apiKey);
     }
 
     protected String getUrl(String endpoint, LinkedHashMap<String, String> queryString) throws URISyntaxException {
