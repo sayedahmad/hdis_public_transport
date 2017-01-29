@@ -16,10 +16,10 @@ import java.util.Optional;
 import javax.json.*;
 
 
-class MapzenMobilityApiWrapper {
+class MapzenMobilityApiWrapper extends MapzenApi {
 
-    private final String apiKey;
-    private final String uriFormat = "https://valhalla.mapzen.com/route?json=%s&api_key=%s";
+//    private final String apiKey;
+//    private final String uriFormat = "https://valhalla.mapzen.com/route?json=%s&api_key=%s";
 
     private static final DateTimeFormatter ISO8601_DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("YYYY-MM-DD'T'HH:mm");
@@ -27,10 +27,12 @@ class MapzenMobilityApiWrapper {
 
     public MapzenMobilityApiWrapper(String apiKey) {
 
+        super("valhalla", apiKey);
+
         if (apiKey == null || apiKey.trim().length() == 0)
             throw new IllegalArgumentException("apiKey cannot be null or empty");
 
-        this.apiKey = apiKey;
+//        this.apiKey = apiKey;
     }
 
     public int getWalkingTripTime(Location start, Location destination) throws IOException {
@@ -144,12 +146,15 @@ class MapzenMobilityApiWrapper {
 
         JsonObject json = jsonObjectBuilder.build();
 
-        String uri = String.format(this.uriFormat, json, this.apiKey);
-        URL url = new URL(uri);
-        InputStream is = url.openStream();
-        JsonReader jsonReader = Json.createReader(is);
-        JsonObject jsonObject = jsonReader.readObject();
+        JsonObject responseJsonObject = null;
 
-        return jsonObject;
+        try {
+            responseJsonObject = super.getResponse("route", json);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            //TODO
+        }
+
+        return responseJsonObject;
     }
 }
