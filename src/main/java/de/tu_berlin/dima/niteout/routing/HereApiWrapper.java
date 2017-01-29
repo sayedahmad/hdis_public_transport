@@ -42,7 +42,7 @@ import static java.util.stream.Collectors.toList;
  * The Wrapper for the here.com API which wraps the requesting and network logic and just returns simple objects of our
  * model that our Service can work with, to keep the dependencies of this API only inside this class.
  */
-public class HereApiWrapper implements PublicTranportAPI {
+class HereApiWrapper implements PublicTranportAPI {
 
     private final static String URL_MAIN = "https://route.cit.api.here.com/routing/7.2/calculateroute.json";
     private final static String URL_APP_ID = "app_id=%s";
