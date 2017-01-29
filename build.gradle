@@ -20,6 +20,10 @@ task deliverableJar(type: Jar) {
     with jar
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
 test.doFirst {
     // load all keys
     def Properties props = new Properties()
