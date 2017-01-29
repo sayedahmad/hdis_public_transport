@@ -1,8 +1,6 @@
 package de.tu_berlin.dima.niteout.routing;
 
 
-import de.tu_berlin.dima.niteout.routing.MapzenApiWrapper;
-import de.tu_berlin.dima.niteout.routing.model.Location;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,9 +11,8 @@ import java.time.LocalDateTime;
  */
 public class MapzenApiWrapperTest {
 
-    private final String apiKey = "mapzen-pj9Lo9N";
-    private final Location TuLocation = new Location(52.51221, 13.32697);
-    private final Location HbfLocation = new Location(52.524742, 13.369563);
+    private final String apiKey = System.getProperty("API_KEY_MAPZEN");
+
 
     @Test
     public void getWalkingTripTime() {
@@ -24,7 +21,7 @@ public class MapzenApiWrapperTest {
         int tripDuration = 0;
 
         try {
-            tripDuration = fixture.getWalkingTripTime(TuLocation, HbfLocation);
+            tripDuration = fixture.getWalkingTripTime(LocationDirectory.TU_BERLIN, LocationDirectory.HAUPTBAHNHOF);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -40,7 +37,10 @@ public class MapzenApiWrapperTest {
         int tripDuration = 0;
 
         try {
-            tripDuration = fixture.getPublicTransportTripTime(TuLocation, HbfLocation, LocalDateTime.now());
+            tripDuration = fixture.getPublicTransportTripTime(
+                    LocationDirectory.TU_BERLIN,
+                    LocationDirectory.HAUPTBAHNHOF,
+                    LocalDateTime.now());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

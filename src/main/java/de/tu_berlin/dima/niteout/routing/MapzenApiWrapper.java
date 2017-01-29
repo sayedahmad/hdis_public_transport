@@ -16,10 +16,11 @@ import javax.json.JsonReader;
 
 class MapzenApiWrapper {
 
-    private String apiKey;
-    private String uriFormat = "https://valhalla.mapzen.com/route?json=%s&api_key=";
+    private final String apiKey;
+    private final String uriFormat = "https://valhalla.mapzen.com/route?json=%s&api_key=%s";
 
-    private static DateTimeFormatter iso8601DateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-DD'T'HH:mm");
+    private static final DateTimeFormatter ISO8601_DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("YYYY-MM-DD'T'HH:mm");
 
 
     public MapzenApiWrapper(String apiKey) {
@@ -28,7 +29,10 @@ class MapzenApiWrapper {
             throw new IllegalArgumentException("apiKey cannot be null or empty");
 
         this.apiKey = apiKey;
-        this.uriFormat += apiKey;
+    }
+
+    private JsonObject getRouteResponse(Location start, Location destination, CostingModel costingModel) throws MalformedURLException, IOException {
+        return getRouteResponse(start, destination, costingModel, null);
     }
 
     public int getWalkingTripTime(Location start, Location destination) throws Exception {
@@ -45,6 +49,7 @@ class MapzenApiWrapper {
 
         return tripDuration;
     }
+
     public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departureTime) {
         int tripDuration = -1;
 
@@ -61,49 +66,35 @@ class MapzenApiWrapper {
         return tripDuration;
     }
 
-    private JsonObject getRouteResponse(Location start, Location destination, CostingModel costingModel) throws MalformedURLException, IOException {
-        return getRouteResponse(start, destination, costingModel, null);
-    }
-
-    private JsonObject getRouteResponse(Location start, Location destination, CostingModel costingModel, LocalDateTime departureTime) throws MalformedURLException, IOException {
+    private JsonObject getRouteResponse(
+            Location start, Location destination,
+            CostingModel costingModel, LocalDateTime departureTime) throws MalformedURLException, IOException {
 
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder()
                 .add("locations", Json.createArrayBuilder()
-                    .add(Json.createObjectBuilder()
-                        .add("lat", start.getLatitude())
-                        .add("lon", start.getLongitude()))
-                    .add(Json.createObjectBuilder()
-                        .add("lat", destination.getLatitude())
-                        .add("lon", destination.getLongitude())))
+                        .add(Json.createObjectBuilder()
+                                .add("lat", start.getLatitude())
+                                .add("lon", start.getLongitude()))
+                        .add(Json.createObjectBuilder()
+                                .add("lat", destination.getLatitude())
+                                .add("lon", destination.getLongitude())))
                 .add("costing", costingModel.getApiString());
 
         if (departureTime != null) {
 
             jsonObjectBuilder.add("date_time", Json.createObjectBuilder()
                     .add("type", 1)
-                    .add("value", departureTime.format(iso8601DateTimeFormatter)));
+                    .add("value", departureTime.format(ISO8601_DATE_TIME_FORMATTER)));
         }
 
         JsonObject json = jsonObjectBuilder.build();
 
-        String uri = String.format(this.uriFormat, json);
+        String uri = String.format(this.uriFormat, json, this.apiKey);
+        URL url = new URL(uri);
+        InputStream is = url.openStream();
+        JsonReader jsonReader = Json.createReader(is);
+        JsonObject jsonObject = jsonReader.readObject();
 
-//        try {
-            URL url = new URL(uri);
-            InputStream is = url.openStream();
-            JsonReader jsonReader = Json.createReader(is);
-            JsonObject jsonObject = jsonReader.readObject();
-
-            return jsonObject;
-//        }
-//        catch (MalformedURLException e) {
-//            // new URL() failed
-//            // ...
-//        }
-//        catch (IOException e) {
-//            // openConnection() failed
-//            // ...
-//        }
-
+        return jsonObject;
     }
 }
