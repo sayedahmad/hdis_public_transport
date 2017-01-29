@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -37,12 +36,13 @@ import static java.util.stream.Collectors.toList;
  * &mode=fastest;publicTransport
  * &combineChange=true
  */
+// TODO add more comments, document methods
 
 /**
  * The Wrapper for the here.com API which wraps the requesting and network logic and just returns simple objects of our
  * model that our Service can work with, to keep the dependencies of this API only inside this class.
  */
-public class HereApiWrapper {
+public class HereApiWrapper implements PublicTranportAPI {
 
     private final static String URL_MAIN = "https://route.cit.api.here.com/routing/7.2/calculateroute.json";
     private final static String URL_APP_ID = "app_id=%s";
@@ -69,10 +69,12 @@ public class HereApiWrapper {
 
     final RateLimiter rateLimiter = RateLimiter.create(MAX_API_RPS); // TODO play with RPS value
 
+    @Override
     public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure) {
         return getMatrixEntryForRouteArguments(0,0,start,destination,departure).getTime();
     }
 
+    @Override
     public Route getPublicTransportDirections(Location start, Location destination, LocalDateTime departure) {
         Reader responseReader = null;
         try {
@@ -98,6 +100,7 @@ public class HereApiWrapper {
         return route;
     }
 
+    @Override
     public List<TimeMatrixEntry> getMultiModalMatrix(Location[] startLocations, Location[] destinationLocations,
                                                      LocalDateTime departureTime) {
 
@@ -152,6 +155,7 @@ public class HereApiWrapper {
     }
 
 
+    @Override
     public RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime departure) {
         Reader responseReader = null;
         try {

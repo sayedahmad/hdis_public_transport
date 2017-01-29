@@ -15,6 +15,12 @@ import java.time.LocalDateTime;
  * It uses external APIs to serve requests.
  */
 public class RoutingService implements RoutingAPI {
+    // TODO move javadocs to Interface
+
+    private static final String API_HERE_APP_ID = "API_HERE_APP_ID";
+    private static final String API_HERE_APP_CODE = "API_HERE_APP_CODE";
+    private PublicTranportAPI publicTranportAPI;
+
 
     /**
      * The time in seconds to travel from one location to another via Public Transport
@@ -25,8 +31,7 @@ public class RoutingService implements RoutingAPI {
      */
     @Override
     public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime startTime) {
-        // TODO implement
-        throw new UnsupportedOperationException("Not yet implemented");
+        return getPublicTransportAPI().getPublicTransportTripTime(start, destination, startTime);
     }
 
     /**
@@ -50,7 +55,7 @@ public class RoutingService implements RoutingAPI {
      */
     @Override
     public Route getPublicTransportDirections(Location start, Location destination, LocalDateTime startTime) {
-        // TODO implement
+        // TODO do we have to implement this?
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -68,13 +73,21 @@ public class RoutingService implements RoutingAPI {
 
     @Override
     public RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime) {
-        // TODO implement
-        throw new UnsupportedOperationException("Not yet implemented");
+        return getPublicTransportAPI().getPublicTransportRouteSummary(start, destination, startTime);
     }
 
     @Override
     public RouteSummary getWalkingRouteSummary(Location start, Location destination) {
         // TODO implement
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    // for lazy initialize
+    private PublicTranportAPI getPublicTransportAPI() {
+        if (publicTranportAPI == null) {
+            // injection - TODO discuss if we use "proper" injection
+            publicTranportAPI = new HereApiWrapper(System.getProperty(API_HERE_APP_ID), System.getProperty(API_HERE_APP_CODE));
+        }
+        return publicTranportAPI;
     }
 }
