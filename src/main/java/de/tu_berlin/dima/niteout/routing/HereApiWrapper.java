@@ -2,7 +2,6 @@ package de.tu_berlin.dima.niteout.routing;
 
 import com.google.common.util.concurrent.RateLimiter;
 import de.tu_berlin.dima.niteout.routing.model.*;
-import de.tu_berlin.dima.niteout.routing.model.mapzen.Units;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -149,11 +148,9 @@ class HereApiWrapper implements PublicTranportAPI {
 
         int distance = jsonRouteSummary.getInt("distance");
         int time = jsonRouteSummary.getInt("baseTime");
-        final String units = Units.KM.getApiString();
-
-        return new TimeMatrixEntry(fromIndex, toIndex, time, distance, units);
+        
+        return new TimeMatrixEntry(fromIndex, toIndex, time, distance, DistanceUnits.KILOMETERS);
     }
-
 
     @Override
     public RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime departure) {

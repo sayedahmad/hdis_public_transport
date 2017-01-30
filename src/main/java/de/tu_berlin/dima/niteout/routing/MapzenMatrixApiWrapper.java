@@ -1,5 +1,6 @@
 package de.tu_berlin.dima.niteout.routing;
 
+import de.tu_berlin.dima.niteout.routing.model.DistanceUnits;
 import de.tu_berlin.dima.niteout.routing.model.Location;
 import de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry;
 import de.tu_berlin.dima.niteout.routing.model.mapzen.CostingModel;
@@ -21,7 +22,8 @@ import java.util.List;
  */
 class MapzenMatrixApiWrapper extends MapzenApi {
 
-    private final Units DistanceUnits = Units.KM;
+    private final Units MapzenDistanceUnits = Units.KM;
+    private final DistanceUnits MatrixDistanceUnits = DistanceUnits.KILOMETERS;
 
     public MapzenMatrixApiWrapper(String apiKey) {
 
@@ -43,7 +45,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
         JsonBuilder jsonBuilder = new JsonBuilder();
         jsonBuilder.addLocation(start);
         jsonBuilder.addLocations(destinations);
-        JsonObject requestJsonObject = jsonBuilder.build(this.DistanceUnits);
+        JsonObject requestJsonObject = jsonBuilder.build(this.MapzenDistanceUnits);
 
         JsonObject response = null;
         try {
@@ -53,7 +55,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
             //TODO
         }
         //TODO check for error(s) in response
-        String units = response.getString("units");
+
         JsonArray outerArray = response.getJsonArray(MatrixType.ONE_TO_MANY.getApiString());
         JsonArray innerArray = outerArray.getJsonArray(0);
 
@@ -69,7 +71,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
                     index - 1,
                     jsonObject.getInt("time"),
                     jsonObject.getJsonNumber("distance").doubleValue(),
-                    units
+                    MatrixDistanceUnits
             );
             out.add(entry);
         }
@@ -84,7 +86,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
         JsonBuilder jsonBuilder = new JsonBuilder();
         jsonBuilder.addLocations(startLocations);
         jsonBuilder.addLocation(destinationLocation);
-        JsonObject requestJsonObject = jsonBuilder.build(this.DistanceUnits);
+        JsonObject requestJsonObject = jsonBuilder.build(this.MapzenDistanceUnits);
 
         JsonObject response = null;
         try {
@@ -94,8 +96,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
             //TODO
         }
         //TODO check for error(s) in response
-        String units = response.getString("units");
-
+        
         ArrayList<TimeMatrixEntry> out = new ArrayList<>(startLocations.length);
 
         for (JsonValue jsonValue : response.getJsonArray(MatrixType.MANY_TO_ONE.getApiString())) {
@@ -109,7 +110,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
                     0,
                     jsonObject.getInt("time"),
                     jsonObject.getJsonNumber("distance").doubleValue(),
-                    units
+                    MatrixDistanceUnits
             );
             out.add(entry);
         }
@@ -130,7 +131,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
                 .add("sources", sourcesBuilder.build())
                 .add("targets", targetsBuilder.build())
                 .add("costing", "pedestrian")
-                .add("units", this.DistanceUnits.getApiString())
+                .add("units", this.MapzenDistanceUnits.getApiString())
                 .build();
 
         JsonObject response = null;
@@ -141,7 +142,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
             //TODO
         }
         //TODO check for error(s) in response
-        String units = response.getString("units");
+        
         JsonArray outerArray = response.getJsonArray(MatrixType.SOURCES_TO_TARGETS.getApiString());
         ArrayList<TimeMatrixEntry> out = new ArrayList<>();
 
@@ -154,7 +155,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
                         jsonObject.getInt("to_index"),
                         jsonObject.getInt("time"),
                         jsonObject.getJsonNumber("distance").doubleValue(),
-                        units
+                        MatrixDistanceUnits
                 );
                 out.add(entry);
             }
@@ -173,7 +174,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
     public List<TimeMatrixEntry> getWalkingMatrix(Location[] locations) throws IOException {
         JsonBuilder jsonBuilder = new JsonBuilder();
         jsonBuilder.addLocations(locations);
-        JsonObject requestJsonObject = jsonBuilder.build(this.DistanceUnits);
+        JsonObject requestJsonObject = jsonBuilder.build(this.MapzenDistanceUnits);
 
         JsonObject response = null;
         try {
@@ -184,8 +185,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
         }
 
         //TODO check for error(s) in response
-        String units = response.getString("units");
-
+        
         ArrayList<TimeMatrixEntry> out = new ArrayList<>();
 
         for (JsonValue innerValue : response.getJsonArray(MatrixType.MANY_TO_MANY.getApiString())) {
@@ -196,7 +196,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
                         jsonObject.getInt("to_index"),
                         jsonObject.getInt("time"),
                         jsonObject.getJsonNumber("distance").doubleValue(),
-                        units
+                        MatrixDistanceUnits
                 );
                 out.add(entry);
             }
