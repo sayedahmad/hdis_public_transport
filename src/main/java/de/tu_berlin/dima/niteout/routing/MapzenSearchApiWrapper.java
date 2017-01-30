@@ -10,7 +10,11 @@ import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 
 /**
- * Created by aardila on 1/28/2017.
+ * A wrapper for the Mapzen Search API.
+ * NOTE: This wrapper only implements the a subset of the functionality offered by the API
+ * @author Andres Ardila
+ * @see https://mapzen.com/products/search/
+ * 
  */
 class MapzenSearchApiWrapper extends MapzenApi implements GeocodingAPI {
 

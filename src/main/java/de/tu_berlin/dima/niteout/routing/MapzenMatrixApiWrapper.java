@@ -15,7 +15,8 @@ import java.util.List;
 
 
 /**
- * Created by aardila on 1/22/2017.
+ * A wrapper for the Mapzen Matrix API
+ * @author Andres Ardila
  */
 class MapzenMatrixApiWrapper extends MapzenApi {
 

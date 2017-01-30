@@ -15,6 +15,11 @@ import java.util.HashMap;
 import javax.json.*;
 
 
+/**
+ * A wrapper for the Mapzen Mobility wrapper
+ * NOTE: This wrapper only implements the a subset of the functionality offered by the API
+ * @author Andres Ardila
+ */
 class MapzenMobilityApiWrapper extends MapzenApi {
 
     private static final DateTimeFormatter ISO8601_DATE_TIME_FORMATTER =

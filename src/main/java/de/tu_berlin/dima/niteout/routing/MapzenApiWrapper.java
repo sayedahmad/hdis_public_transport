@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Created by aardila on 1/26/2017.
+ * An implementation of the {@link WalkingDirectionsAPI} as a facade to other Mapzen APIs (like Mobility and Matrix)
+ * @author Andres Ardila
  */
 class MapzenApiWrapper implements WalkingDirectionsAPI {
 
