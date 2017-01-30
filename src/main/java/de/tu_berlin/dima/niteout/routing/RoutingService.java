@@ -122,7 +122,7 @@ public class RoutingService implements RoutingAPI {
         switch (transportMode) {
 
             case PUBLIC_TRANSPORT:
-                return this.publicTranportAPI.getMultiModalMatrix(startLocations, destinationLocations, startTime);
+                return getPublicTransportAPI().getMultiModalMatrix(startLocations, destinationLocations, startTime);
 
             case WALKING:
                 MapzenApiWrapper wrapper = new MapzenApiWrapper(System.getProperty("API_KEY_MAPZEN"));
