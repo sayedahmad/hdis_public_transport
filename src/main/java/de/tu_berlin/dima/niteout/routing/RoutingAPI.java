@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// TODO document methods
+
 public interface RoutingAPI {
 
     //int getPublicTransportTripTime(Location start, Location destination, LocalDateTime startTime);
