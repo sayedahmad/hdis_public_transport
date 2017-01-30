@@ -17,15 +17,8 @@ import de.tu_berlin.dima.niteout.routing.model.TransportMode;
 public class RoutingServiceTest {
 
     @Test
-    public void getEmptyRoute() throws Exception {
-//        RoutingService service = new RoutingService();
-//        assertNotNull(service.getEmptyRoute());
-//        assertEquals("No route found", service.getEmptyRoute());
-    }
-
-    @Test
     public void testGetWalkingTripTime() {
-        RoutingService fixture = new RoutingService();
+        final RoutingService fixture = new RoutingService();
         int tripTime = 0;
         try {
             tripTime = fixture.getTripTime(TransportMode.WALKING,
@@ -33,6 +26,7 @@ public class RoutingServiceTest {
                     LocalDateTime.now());
         } catch (IOException e) {
             e.printStackTrace();
+            Assert.fail(e.getMessage());
         }
         Assert.assertTrue(tripTime > 0);
     }
@@ -40,22 +34,24 @@ public class RoutingServiceTest {
     @Test
     public void testGetWalkingRouteSummary() {
 
-        RoutingService fixture = new RoutingService();
-        LocalDateTime now = LocalDateTime.now();
+        final RoutingService fixture = new RoutingService();
+        final LocalDateTime now = LocalDateTime.now();
 
         try {
             RouteSummary routeSummary = fixture.getRouteSummary(
                     TransportMode.WALKING,
                     LocationDirectory.TU_BERLIN, LocationDirectory.POTSDAMER_PLATZ,
-                    LocalDateTime.now());
+                    now);
             Assert.assertNotNull(routeSummary);
             Assert.assertNotEquals(0, routeSummary.getTotalDuration());
             Assert.assertNotEquals(0, routeSummary.getTotalDistance());
+            //check that the departure time is within 1 minute of what we specified
             Assert.assertTrue(MINUTES.between(routeSummary.getDepartureTime(), now) <= 1);
             Assert.assertNotNull(routeSummary.getArrivalTime());
             Assert.assertTrue(routeSummary.getArrivalTime().isAfter(now));
-            Assert.assertTrue(MINUTES.between(
-                    now.plusSeconds(routeSummary.getTotalDuration()), routeSummary.getArrivalTime()) <= 1);
+            //check that the departure time plus the duration is about the same as the arrival time
+            Assert.assertTrue(
+            		MINUTES.between(now.plusSeconds(routeSummary.getTotalDuration()),routeSummary.getArrivalTime()) <= 1);
         } catch (IOException e) {
             e.printStackTrace();
             Assert.fail();
