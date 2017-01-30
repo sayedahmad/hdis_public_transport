@@ -1,6 +1,7 @@
 package de.tu_berlin.dima.niteout.routing;
 
 import de.tu_berlin.dima.niteout.routing.model.*;
+import de.tu_berlin.dima.niteout.routing.model.mapzen.Units;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,18 +9,16 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static de.tu_berlin.dima.niteout.routing.LocationDirectory.ALEXANDERPLATZ;
 import static de.tu_berlin.dima.niteout.routing.LocationDirectory.BRANDENBURGER_TOR;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class PublicTranportAPIWrapperTest {
 
-    private static Location[] B_TOR_ARRAY_MANY = (Location[]) fillWith(new Location[500], BRANDENBURGER_TOR);
-    private static Location[] B_TOR_ARRAY_ONE = {BRANDENBURGER_TOR};
     private static BoundingBox BERLIN_MITTE = new BoundingBox(13.3295,52.4849, 13.4483, 52.5439);
 
     private PublicTranportAPI api;
@@ -30,13 +29,14 @@ public class PublicTranportAPIWrapperTest {
     }
 
     @Test
-    public void getTimeTest() {
+    public void getTimeTestFromBtorToAlex() {
         int time = api.getPublicTransportTripTime(BRANDENBURGER_TOR, ALEXANDERPLATZ, LocalDateTime.now());
-        assertTrue(time > 0);
+        assertTrue(time > 300);
+        assertTrue(time < 7200);
     }
 
     @Test
-    public void getMatrixTest() {
+    public void getMatrixTestFromAndToRandomLocationsInBerlin() {
         Location[] starts = new Location[5],
             destinations = new Location[10];
         for (int i = 0; i < starts.length; i++) {
@@ -45,21 +45,31 @@ public class PublicTranportAPIWrapperTest {
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = LocationDirectory.getRandomLocation(BERLIN_MITTE);
         }
+        boolean[] indexed = new boolean[starts.length * destinations.length];
+        long start = System.currentTimeMillis();
         List<TimeMatrixEntry> list = api.getMultiModalMatrix(starts, destinations, LocalDateTime.now());
+        System.out.print("duration 50 calls: " + (System.currentTimeMillis() - start) + "ms");
         assertNotNull(list);
-        assertTrue(list.size() > 0);
-    }
+        assertEquals(list.size(), 50);
+        list.forEach((TimeMatrixEntry e) -> {
+            assertTrue(e.getTime() > 0);
+            assertTrue(e.getTime() < 14400);
+            assertTrue(e.getDistance() < (e.getUnits().equals(DistanceUnits.KILOMETERS) ? 200000 : 130000));
+            assertTrue(e.getFromIndex() < starts.length);
+            assertTrue(e.getFromIndex() >= 0);
+            assertTrue(e.getToIndex() < destinations.length);
+            assertTrue(e.getToIndex() >= 0);
+            indexed[e.getFromIndex() + e.getToIndex()*starts.length] = true;
+        });
 
-    private static Object[] fillWith(Object[] array, Object filler) {
-        for (int i = 0; i < array.length; i++) {
-            array[i] = filler;
-        }
-        return array;
+        // none should be false, which they are if they were not in the returned list
+        assertFalse(IntStream.range(0, starts.length * destinations.length).anyMatch(i -> !indexed[i]));
+
     }
 
     @Test
-    public void getPublicTransportRouteSummaryTest() {
-        // always next monday 12:37 to ensure there is traffic and the api call is in near future
+    public void getPublicTransportRouteSummaryTestFromBTorToAlexNextMondayTwelveThirtyseven() {
+        // always next monday 12:37 to ensure there is traffic at the departure time
         LocalDateTime time = LocalDateTime.now().withHour(12).withMinute(37).with(TemporalAdjusters.next(DayOfWeek.MONDAY));
 
         RouteSummary routeSummary = api.getPublicTransportRouteSummary(BRANDENBURGER_TOR, ALEXANDERPLATZ,time);
@@ -73,13 +83,12 @@ public class PublicTranportAPIWrapperTest {
                 routeSummary.getArrivalTime());
         // duration less than 2 hours
         assertTrue(routeSummary.getTotalDuration() < 7200);
-        LocalDateTime dep = routeSummary.getDepartureTime(),
-                arr = routeSummary.getArrivalTime();
         // requested time to scheduled time max 1 hour diff
-        assertTrue(time.until(dep, ChronoUnit.HOURS) < 1);
+        assertTrue(time.until(routeSummary.getDepartureTime(), ChronoUnit.HOURS) < 1);
         // from btor to alex max 4 changes
         assertTrue(routeSummary.getNumberOfChanges() < 5);
 
-        // attributes not tested at all: distance
+        // from btor to alex around 3km
+        assertTrue(routeSummary.getTotalDistance() > 1500 && routeSummary.getTotalDistance() < 5000);
     }
 }
