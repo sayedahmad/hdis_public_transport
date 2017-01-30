@@ -8,9 +8,9 @@ public class TimeMatrixEntry {
     private int toIndex;
     private int time;
     private double distance;
-    private String units;
+    private DistanceUnits units;
 
-    public TimeMatrixEntry(int fromIndex, int toIndex, int time, double distance, String units) {
+    public TimeMatrixEntry(int fromIndex, int toIndex, int time, double distance, DistanceUnits units) {
         this.fromIndex = fromIndex;
         this.toIndex = toIndex;
         this.time = time;
@@ -50,11 +50,11 @@ public class TimeMatrixEntry {
         this.distance = distance;
     }
 
-    public String getUnits() {
+    public DistanceUnits getUnits() {
         return units;
     }
 
-    public void setUnits(String units) {
+    public void setUnits(DistanceUnits units) {
         this.units = units;
     }
 }

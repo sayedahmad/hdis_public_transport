@@ -14,7 +14,8 @@ import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 
 /**
- * Created by aardila on 1/28/2017.
+ * A base class for Mapzen API consumers/wrappers
+ * @author Andres Ardila
  */
 abstract class MapzenApi {
 

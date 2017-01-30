@@ -15,7 +15,6 @@ import java.util.List;
  * It uses external APIs to serve requests.
  */
 public class RoutingService implements RoutingAPI {
-    // TODO move javadocs to Interface
 
     private static class Settings {
 
@@ -28,7 +27,7 @@ public class RoutingService implements RoutingAPI {
     private PublicTranportAPI publicTranportAPI;
     private WalkingDirectionsAPI walkingDirectionsAPI;
 
-    // for lazy initialize
+    // API lazy initialization
     private PublicTranportAPI getPublicTransportAPI() {
         if (publicTranportAPI == null) {
             // injection - TODO discuss if we use "proper" injection
