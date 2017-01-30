@@ -4,11 +4,15 @@ import de.tu_berlin.dima.niteout.routing.model.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import static de.tu_berlin.dima.niteout.routing.LocationDirectory.ALEXANDERPLATZ;
 import static de.tu_berlin.dima.niteout.routing.LocationDirectory.BRANDENBURGER_TOR;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -55,9 +59,19 @@ public class PublicTranportAPIWrapperTest {
 
     @Test
     public void getPublicTransportRouteSummaryTest() {
-        RouteSummary routeSummary = api.getPublicTransportRouteSummary(BRANDENBURGER_TOR, ALEXANDERPLATZ,
-                LocalDateTime.now());
+        // always next monday 12:37 to ensure there is traffic and the api call is in near future
+        LocalDateTime time = LocalDateTime.now().withHour(12).withMinute(37).with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+
+        RouteSummary routeSummary = api.getPublicTransportRouteSummary(BRANDENBURGER_TOR, ALEXANDERPLATZ,time);
+
         assertNotNull(routeSummary);
-        // more extensive testing
+        // test aggregated travel times map == duration
+        assertEquals(routeSummary.getTotalDuration(),
+                routeSummary.getModeOfTransportTravelTimes().values().stream().mapToInt(Integer::intValue).sum());
+        // test departure + total travel time == arrival
+        assertEquals(routeSummary.getDepartureTime().plusSeconds(routeSummary.getTotalDuration()),
+                routeSummary.getArrivalTime());
+        // from btor to alex max 4 changes
+        assertTrue(routeSummary.getNumberOfChanges() < 5);
     }
 }
