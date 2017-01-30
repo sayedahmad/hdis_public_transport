@@ -6,9 +6,6 @@ import de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry;
 import de.tu_berlin.dima.niteout.routing.model.mapzen.CostingModel;
 import de.tu_berlin.dima.niteout.routing.model.mapzen.MatrixType;
 import de.tu_berlin.dima.niteout.routing.model.mapzen.Units;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 import javax.json.*;
 import java.io.IOException;

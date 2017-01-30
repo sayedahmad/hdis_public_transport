@@ -56,6 +56,7 @@ class HereApiWrapper implements PublicTranportAPI {
     private final String apiId;
     private final String apiCode;
 
+    private final RateLimiter rateLimiter = RateLimiter.create(MAX_API_RPS); // TODO fine-tune RPS value
     private OkHttpClient httpClient;
 
     public HereApiWrapper(String apiId, String apiCode) {
@@ -65,8 +66,7 @@ class HereApiWrapper implements PublicTranportAPI {
         this.apiId = apiId;
         this.apiCode = apiCode;
     }
-
-    final RateLimiter rateLimiter = RateLimiter.create(MAX_API_RPS); // TODO play with RPS value
+    
 
     @Override
     public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure) {
@@ -241,8 +241,10 @@ class HereApiWrapper implements PublicTranportAPI {
                 .url(url)
                 .build();
 
+        //Acquire a ticket from the rate limiter
         rateLimiter.acquire();
         Response response = getHTTPClient().newCall(request).execute();
+        
         return response.body().charStream();
     }
 

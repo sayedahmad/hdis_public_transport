@@ -1,19 +1,15 @@
 package de.tu_berlin.dima.niteout.routing;
 
-import de.tu_berlin.dima.niteout.routing.model.Location;
-import de.tu_berlin.dima.niteout.routing.model.RouteSummary;
-import de.tu_berlin.dima.niteout.routing.model.TransportMode;
-import org.junit.Assert;
-import org.junit.Test;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAmount;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
-import static java.time.temporal.ChronoUnit.SECONDS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Assert;
+import org.junit.Test;
+
+import de.tu_berlin.dima.niteout.routing.model.RouteSummary;
+import de.tu_berlin.dima.niteout.routing.model.TransportMode;
 
 /**
  * Test class for {@link RoutingService}.

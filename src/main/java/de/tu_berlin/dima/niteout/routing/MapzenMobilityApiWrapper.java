@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.Optional;
 import javax.json.*;
 
 
@@ -70,8 +69,6 @@ class MapzenMobilityApiWrapper extends MapzenApi {
         JsonObject response = getRouteResponse(start, destination, CostingModel.PEDESTRIAN, dateTime);
         JsonObject summaryJsonObject = response.getJsonObject("trip").getJsonObject("summary");
 
-        RouteSummary routeSummary = new RouteSummary();
-
         int tripDuration = summaryJsonObject.getInt("time");
         double distance = summaryJsonObject.getJsonNumber("length").doubleValue();
         JsonArray locations = response.getJsonObject("trip").getJsonArray("locations");
@@ -90,18 +87,21 @@ class MapzenMobilityApiWrapper extends MapzenApi {
         if (arrivalDateTimeString.charAt(16) != '+') {
             arrivalDateTimeString = fixDateTimeString(arrivalDateTimeString);
         }
+        
         OffsetDateTime departureDateTime = OffsetDateTime.parse(departureDateTimeString);
         OffsetDateTime arrivalDateTime = OffsetDateTime.parse(arrivalDateTimeString);
 
-        RouteSummary out = new RouteSummary();
-        out.setTotalDuration(tripDuration);
-        out.setDepartureTime(departureDateTime.toLocalDateTime());
-        out.setArrivalTime(arrivalDateTime.toLocalDateTime());
-        out.setTotalDistance(distance);
+        RouteSummary routeSummary = new RouteSummary();
+        routeSummary.setTotalDuration(tripDuration);
+        routeSummary.setDepartureTime(departureDateTime.toLocalDateTime());
+        routeSummary.setArrivalTime(arrivalDateTime.toLocalDateTime());
+        routeSummary.setTotalDistance(distance);
+        //TODO distance units
         HashMap<TransportMode, Integer> hashMap = new HashMap<>(1);
         hashMap.put(TransportMode.WALKING, tripDuration);
+        routeSummary.setModeOfTransportTravelTimes(hashMap);
 
-        return out;
+        return routeSummary;
     }
 
     /**

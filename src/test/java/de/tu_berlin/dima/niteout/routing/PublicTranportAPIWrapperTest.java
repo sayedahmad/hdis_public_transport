@@ -14,11 +14,18 @@ import static org.junit.Assert.assertTrue;
 
 public class PublicTranportAPIWrapperTest {
 
-    private static Location[] B_TOR_ARRAY_MANY = (Location[]) fillWith(new Location[500], BRANDENBURGER_TOR);
+    private static Location[] B_TOR_ARRAY_MANY = (Location[]) fillWith(new Location[50], BRANDENBURGER_TOR);
     private static Location[] B_TOR_ARRAY_ONE = {BRANDENBURGER_TOR};
     private static BoundingBox BERLIN_MITTE = new BoundingBox(13.3295,52.4849, 13.4483, 52.5439);
 
     private PublicTranportAPI api;
+
+    private static Object[] fillWith(Object[] array, Object filler) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = filler;
+        }
+        return array;
+    }
 
     @Before
     public void init() {
@@ -44,13 +51,7 @@ public class PublicTranportAPIWrapperTest {
         List<TimeMatrixEntry> list =
                 api.getMultiModalMatrix(starts, destinations, LocalDateTime.now());
         int i = 5;
-    }
-
-    private static Object[] fillWith(Object[] array, Object filler) {
-        for (int i = 0; i < array.length; i++) {
-            array[i] = filler;
-        }
-        return array;
+        // TODO incomplete test
     }
 
     @Test
@@ -58,6 +59,6 @@ public class PublicTranportAPIWrapperTest {
         RouteSummary routeSummary = api.getPublicTransportRouteSummary(BRANDENBURGER_TOR, ALEXANDERPLATZ,
                 LocalDateTime.now());
         assertNotNull(routeSummary);
-        // more extensive testing
+        // TODO more extensive testing
     }
 }

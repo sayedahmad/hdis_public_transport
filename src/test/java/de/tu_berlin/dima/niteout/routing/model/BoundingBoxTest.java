@@ -3,8 +3,6 @@ package de.tu_berlin.dima.niteout.routing.model;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by aardila on 1/29/2017.
  */
