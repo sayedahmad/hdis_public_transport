@@ -139,7 +139,7 @@ public class RoutingService implements RoutingAPI {
         switch (transportMode) {
 
             case PUBLIC_TRANSPORT:
-                return this.publicTranportAPI.getMultiModalMatrix(startLocations, destinationLocations, startTime);
+                return getPublicTransportAPI().getMultiModalMatrix(startLocations, destinationLocations, startTime);
 
             case WALKING:
                 return getWalkingDirectionsAPI().getWalkingMatrix(startLocations, destinationLocations);
