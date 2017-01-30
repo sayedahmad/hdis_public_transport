@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
@@ -45,9 +45,9 @@ public class PublicTranportAPIWrapperTest {
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = LocationDirectory.getRandomLocation(BERLIN_MITTE);
         }
-        List<TimeMatrixEntry> list =
-                api.getMultiModalMatrix(starts, destinations, LocalDateTime.now());
-        int i = 5;
+        List<TimeMatrixEntry> list = api.getMultiModalMatrix(starts, destinations, LocalDateTime.now());
+        assertNotNull(list);
+        assertTrue(list.size() > 0);
     }
 
     private static Object[] fillWith(Object[] array, Object filler) {
@@ -68,10 +68,18 @@ public class PublicTranportAPIWrapperTest {
         // test aggregated travel times map == duration
         assertEquals(routeSummary.getTotalDuration(),
                 routeSummary.getModeOfTransportTravelTimes().values().stream().mapToInt(Integer::intValue).sum());
-        // test departure + total travel time == arrival
+        // test departure + duration == arrival
         assertEquals(routeSummary.getDepartureTime().plusSeconds(routeSummary.getTotalDuration()),
                 routeSummary.getArrivalTime());
+        // duration less than 2 hours
+        assertTrue(routeSummary.getTotalDuration() < 7200);
+        LocalDateTime dep = routeSummary.getDepartureTime(),
+                arr = routeSummary.getArrivalTime();
+        // requested time to scheduled time max 1 hour diff
+        assertTrue(time.until(dep, ChronoUnit.HOURS) < 1);
         // from btor to alex max 4 changes
         assertTrue(routeSummary.getNumberOfChanges() < 5);
+
+        // attributes not tested at all: distance
     }
 }
