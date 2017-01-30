@@ -23,4 +23,4 @@ Vamsee Mithra Kilari | – | <kilari@campus.tu-berlin.de> | 0174 5945603
 ### Data Integration Contact Persons
 
 * Thomas (Public Transport directions)
-* Amin (Walking directions)
+* Andres (Walking directions)
