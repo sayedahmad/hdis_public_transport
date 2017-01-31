@@ -9,12 +9,36 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PublicTranportAPI {
+
+    /**
+     * Get the amount of time in seconds to travel between two locations with, or walking if public
+     * transport is not suitable.
+     * @param start the location where the trip starts
+     * @param destination the location where the trip terminates
+     * @param departure the date and time at which the trip starts
+     * @return the total number of seconds required for the trip
+     */
     int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure);
 
-    Route getPublicTransportDirections(Location start, Location destination, LocalDateTime departure);
+    /**
+     * Gets the summary details about a route between two locations with public transport, or walking if public
+     * transport is not suitable.
+     * @param start the location where the trip starts
+     * @param destination the location where the trip terminates
+     * @param departure the date and time at which the trip starts
+     * @return a RouteSummary with the details about the route
+     */
+    RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime departure);
 
+    /**
+     * Gets a matrix with trip information between start and destination locations using public transport,
+     * or walking if public transport is not suitable.
+     * @param startLocations the locations where the trips start
+     * @param destinationLocations the locations where the trips terminate
+     * @param departureTime the date and time at which the trips start
+     * @return a matrix with trip information between start and destination locations
+     */
     List<TimeMatrixEntry> getMultiModalMatrix(Location[] startLocations, Location[] destinationLocations,
                                               LocalDateTime departureTime);
 
-    RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime departure);
 }

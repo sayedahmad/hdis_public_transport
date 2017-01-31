@@ -22,18 +22,20 @@ import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static java.util.stream.Collectors.toList;
 
 /*
+ *
+ *
  * API Wrapper that uses the HERE Api
  * www.here.com
- * Example API call
- * <p>
+ * Example API call:
+ *
  * https://route.cit.api.here.com/routing/7.2/calculateroute.json
- * ?app_id={YOUR_APP_ID}
- * &app_code={YOUR_APP_CODE}
- * &waypoint0=geo!52.530,13.326
- * &waypoint1=geo!52.513,13.407
- * &departure=now
- * &mode=fastest;publicTransport
- * &combineChange=true
+ *   ?app_id={YOUR_APP_ID}
+ *   &app_code={YOUR_APP_CODE}
+ *   &waypoint0=geo!52.530,13.326
+ *   &waypoint1=geo!52.513,13.407
+ *   &departure=now
+ *   &mode=fastest;publicTransport
+ *   &combineChange=true
  */
 // TODO add more comments, document methods
 
@@ -51,13 +53,13 @@ class HereApiWrapper implements PublicTranportAPI {
     private final static String URL_DEPARTURE = "departure=%s";
     private final static String URL_MODE = "mode=fastest;publicTransport";
     private final static String URL_COMBINE_CHANGE = "combineChange=true";
-    private final static double MAX_API_RPS = 1.0;
+    private final static double MAX_API_RPS = 1;
 
     private final String apiId;
     private final String apiCode;
 
     private final RateLimiter rateLimiter = RateLimiter.create(MAX_API_RPS); // TODO fine-tune RPS value
-    private OkHttpClient httpClient;
+    private final OkHttpClient httpClient = new OkHttpClient();
 
     public HereApiWrapper(String apiId, String apiCode) {
         if (apiId == null || apiId.trim().isEmpty() || apiCode == null || apiCode.trim().isEmpty()) {
@@ -66,7 +68,6 @@ class HereApiWrapper implements PublicTranportAPI {
         this.apiId = apiId;
         this.apiCode = apiCode;
     }
-    
 
     @Override
     public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure) {
@@ -74,42 +75,16 @@ class HereApiWrapper implements PublicTranportAPI {
     }
 
     @Override
-    public Route getPublicTransportDirections(Location start, Location destination, LocalDateTime departure) {
-        Reader responseReader = null;
-        try {
-            responseReader = getHTTPResponse(start, destination, departure);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        JsonObject json = null;
-
-        try {
-            json = Json.createReader(responseReader).readObject();
-        } catch (JsonParsingException e) {
-            System.out.println(LocalDateTime.now() + ":: fail getPublicTransportDirections: " + e.getMessage());
-        }
-
-        assert json != null;
-
-        Route route = new Route();
-
-        // TODO does this have to be implemented?
-        //route.setSegments(json);
-
-        return route;
-    }
-
-    @Override
     public List<TimeMatrixEntry> getMultiModalMatrix(Location[] startLocations, Location[] destinationLocations,
                                                      LocalDateTime departureTime) {
 
-        IntStream startIndices = IntStream.range(0, startLocations.length - 1);
+        IntStream startIndices = IntStream.range(0, startLocations.length);
 
         // Parallelize all start locations, map each of them to all destination locations and get a MatrixEntry for
         // each combination. Then collect them again to a single list and return it.
         // TODO check parallelism, now it just depends on startDestinations and does not scale for 1-n
         return startIndices.parallel()
-                .mapToObj(i -> IntStream.range(0, destinationLocations.length - 1)
+                .mapToObj(i -> IntStream.range(0, destinationLocations.length)
                         .mapToObj(j ->
                                 getMatrixEntryForRouteArguments(i, j, startLocations[i], destinationLocations[j], departureTime))
                         .collect(toList()))
@@ -117,8 +92,8 @@ class HereApiWrapper implements PublicTranportAPI {
                 .collect(toList());
     }
 
-    private TimeMatrixEntry getMatrixEntryForRouteArguments(int fromIndex, int toIndex, Location start, Location destination,
-                                                            LocalDateTime departure) {
+    private TimeMatrixEntry getMatrixEntryForRouteArguments(int fromIndex, int toIndex, Location start,
+                                                            Location destination, LocalDateTime departure) {
 
         System.out.println(LocalDateTime.now() + ":: request  #" + toIndex + ":" + fromIndex);
         Reader response = null;
@@ -127,6 +102,8 @@ class HereApiWrapper implements PublicTranportAPI {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        assert response != null;
         JsonObject json = null;
 
         try {
@@ -134,12 +111,14 @@ class HereApiWrapper implements PublicTranportAPI {
         } catch (JsonParsingException e) {
             System.out.println(LocalDateTime.now() + ":: fail     #" + fromIndex + ":" + toIndex + "\t " + e.getClass().getSimpleName());
         }
+
+        assert json != null;
         return getTimeMatrixEntryFromJsonRoute(fromIndex, toIndex, json);
     }
 
     private TimeMatrixEntry getTimeMatrixEntryFromJsonRoute(int fromIndex, int toIndex, JsonObject json) {
-        assert json != null;
-        // only get first RouteSummary as it will not return alternatives TODO is this really the case?
+
+        // only get first RouteSummary as it will not return alternatives due to missing 'alternative' request parameter
         JsonObject jsonRouteSummary = json
                 .getJsonObject("response")
                 .getJsonArray("route")
@@ -160,6 +139,7 @@ class HereApiWrapper implements PublicTranportAPI {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        assert responseReader != null;
         JsonObject json = null;
 
         try {
@@ -168,17 +148,25 @@ class HereApiWrapper implements PublicTranportAPI {
             System.out.println(LocalDateTime.now() + ":: fail getPublicTransportDirections: " + e.getMessage());
         }
 
+        assert json != null;
         return getRouteSummaryFromJsonResponse(json);
 
     }
 
     private RouteSummary getRouteSummaryFromJsonResponse(JsonObject json) {
-        assert json != null;
 
-        JsonObject route = json
-                .getJsonObject("response")
-                .getJsonArray("route")
-                .getJsonObject(0);
+        JsonObject route = null;
+        try {
+            route = json
+                    .getJsonObject("response")
+                    .getJsonArray("route")
+                    .getJsonObject(0);
+        } catch (NullPointerException e) {
+            System.err.println("no route in:\n" + json.toString());
+            throw new IllegalStateException("no route in response");
+        }
+
+        assert route != null;
 
         // travel times for modes: route/leg[]/maneuver{_type,traveltime}
         JsonArray legs = route.getJsonArray("leg");
@@ -222,12 +210,16 @@ class HereApiWrapper implements PublicTranportAPI {
         // number of changes: route/publicTransportLine -1
         int numberOfChanges = route.getJsonArray("publicTransportLine").size() - 1;
 
+        // distance: route/summary/distance
+        int distance = route.getJsonObject("summary").getInt("distance");
+
         RouteSummary routeSummary = new RouteSummary();
         routeSummary.setArrivalTime(arrival);
         routeSummary.setDepartureTime(departure);
         routeSummary.setNumberOfChanges(numberOfChanges);
         routeSummary.setTotalDuration(duration);
         routeSummary.setModeOfTransportTravelTimes(modeOfTransportTravelTimes);
+        routeSummary.setTotalDistance(distance);
         return routeSummary;
 
     }
@@ -243,7 +235,7 @@ class HereApiWrapper implements PublicTranportAPI {
 
         //Acquire a ticket from the rate limiter
         rateLimiter.acquire();
-        Response response = getHTTPClient().newCall(request).execute();
+        Response response = httpClient.newCall(request).execute();
         
         return response.body().charStream();
     }
@@ -269,13 +261,5 @@ class HereApiWrapper implements PublicTranportAPI {
 
     private static String formatParameter(boolean firstParameter, String parameterTemplate, Object... args) {
         return (firstParameter ? "?" : "&") + String.format(parameterTemplate, args);
-    }
-
-    // lazy init
-    private OkHttpClient getHTTPClient() {
-        if (httpClient == null) {
-            this.httpClient = new OkHttpClient();
-        }
-        return httpClient;
     }
 }

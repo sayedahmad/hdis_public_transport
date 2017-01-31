@@ -8,19 +8,27 @@ import java.util.List;
 
 /**
  * Service to process routing requests.
- *
+ * <p>
  * This class typically takes input of locations and times and returns options of different rides using the public
  * transportation in Berlin.
- *
+ * <p>
  * It uses external APIs to serve requests.
  */
 public class RoutingService implements RoutingAPI {
 
     private static class Settings {
 
-        static final String getHereApiAppID() { return System.getProperty("API_HERE_APP_ID"); }
-        static final String getHereApiAppCode() { return System.getProperty("API_HERE_APP_CODE"); }
-        static final String getMapzenApiKey() { return System.getProperty("API_KEY_MAPZEN"); }
+        static final String getHereApiAppID() {
+            return System.getProperty("API_HERE_APP_ID");
+        }
+
+        static final String getHereApiAppCode() {
+            return System.getProperty("API_HERE_APP_CODE");
+        }
+
+        static final String getMapzenApiKey() {
+            return System.getProperty("API_KEY_MAPZEN");
+        }
     }
 
 
@@ -45,9 +53,10 @@ public class RoutingService implements RoutingAPI {
 
     /**
      * The time in seconds to travel from one location to another via Public Transport
-     * @param start The starting location
+     *
+     * @param start       The starting location
      * @param destination The destination location
-     * @param startTime The time at which the journey will begin
+     * @param startTime   The time at which the journey will begin
      * @return The total travel time in seconds
      */
     private int getPublicTransportTripTime(Location start, Location destination, LocalDateTime startTime) {
@@ -56,36 +65,14 @@ public class RoutingService implements RoutingAPI {
 
     /**
      * The time in seconds to walk from one location to another
-     * @param start The starting location
+     *
+     * @param start       The starting location
      * @param destination The destination location
      * @return The travel time in seconds
      */
     private int getWalkingTripTime(Location start, Location destination) throws IOException {
 
         return getWalkingDirectionsAPI().getWalkingTripTime(start, destination);
-    }
-
-    /**
-     * The turn-by-turn direction to travel from one location to another via Public Transport at a specific time
-     * @param start The start location
-     * @param destination The destination location
-     * @param startTime The time at which the journey will begin
-     * @return The Route containing the directions
-     */
-    private Route getPublicTransportDirections(Location start, Location destination, LocalDateTime startTime) {
-        // TODO do we have to implement this?
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    /**
-     * The turn-by-turn directions to travel from one location to another by foot
-     * @param start The start location
-     * @param destination The destination location
-     * @return The Route containing the directions
-     */
-    private Route getWalkingDirections(Location start, Location destination) {
-        // TODO implement
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     private RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime) {
