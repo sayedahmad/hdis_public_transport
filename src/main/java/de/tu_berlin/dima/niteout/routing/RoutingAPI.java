@@ -2,7 +2,6 @@ package de.tu_berlin.dima.niteout.routing;
 
 import de.tu_berlin.dima.niteout.routing.model.*;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,11 +18,11 @@ public interface RoutingAPI {
 	 * @param destinationLocation the location where the trip terminates
 	 * @param startTime the date and time at which the trip starts
 	 * @return the total number of seconds required for the trip 
-	 * @throws IOException
+     * @throws RoutingAPIException which contains an identifier of the error
 	 */
     int getTripTime(TransportMode transportMode,
                     Location startLocation, Location destinationLocation,
-                    LocalDateTime startTime) throws IOException;
+                    LocalDateTime startTime) throws RoutingAPIException;
 
 
     //Route getPublicTransportDirections(Location start, Location destination, LocalDateTime startTime);
@@ -39,11 +38,11 @@ public interface RoutingAPI {
      * @param destinationLocation the location where the trip terminates
      * @param startTime the date and time at which the trip starts
      * @return a RouteSummary with the details about the route
-     * @throws IOException
+     * @throws RoutingAPIException which contains an identifier of the error
      */
     RouteSummary getRouteSummary(TransportMode transportMode,
                                  Location startLocation, Location destinationLocation,
-                                 LocalDateTime startTime) throws IOException;
+                                 LocalDateTime startTime) throws RoutingAPIException;
 
     /**
      * Gets a matrix with trip information between start and destination locations
@@ -52,9 +51,9 @@ public interface RoutingAPI {
      * @param destinationLocations the locations where the trips terminate
      * @param startTime the date and time at which the trips start
      * @return a matrix with trip information between start and destination locations
-     * @throws IOException
+     * @throws RoutingAPIException which contains an identifier of the error
      */
     List<TimeMatrixEntry> getMatrix(TransportMode transportMode,
                                     Location[] startLocations, Location[] destinationLocations,
-                                    LocalDateTime startTime) throws IOException;
+                                    LocalDateTime startTime) throws RoutingAPIException;
 }
