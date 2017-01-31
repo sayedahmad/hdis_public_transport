@@ -4,7 +4,8 @@
   <OriginalElement />
   <nodes>
     <node x="15.0" y="142.0">de.tu_berlin.dima.niteout.routing.model.Segment</node>
-    <node x="0.0" y="481.0">de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry</node>
+    <node x="38.0" y="481.0">de.tu_berlin.dima.niteout.routing.model.DistanceUnits</node>
+    <node x="0.0" y="611.0">de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry</node>
     <node x="341.5" y="0.0">de.tu_berlin.dima.niteout.routing.model.TransportMode</node>
     <node x="256.0" y="481.0">de.tu_berlin.dima.niteout.routing.model.Address</node>
     <node x="36.0" y="356.0">de.tu_berlin.dima.niteout.routing.model.Route</node>
@@ -19,6 +20,10 @@
       <point x="373.0" y="105.0" />
       <point x="-31.5" y="40.0" />
     </edge>
+    <edge source="de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry" target="de.tu_berlin.dima.niteout.routing.model.DistanceUnits">
+      <point x="0.0" y="-76.0" />
+      <point x="0.0" y="40.0" />
+    </edge>
     <edge source="de.tu_berlin.dima.niteout.routing.model.Route" target="de.tu_berlin.dima.niteout.routing.model.Segment">
       <point x="0.0" y="-40.0" />
       <point x="0.0" y="76.0" />
@@ -32,7 +37,7 @@
       <point x="31.5" y="40.0" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="0.5895865237366003" x="286.5" y="316.50000000000006" />
+  <settings layout="Hierarchic Group" zoom="0.698595146871009" x="286.5" y="381.5" />
   <SelectedNodes>
     <node>de.tu_berlin.dima.niteout.routing.model.Address</node>
   </SelectedNodes>
