@@ -1,13 +1,8 @@
 # HDIS NiteOut Semester Project - Public Transport Component
 
-## Group Communication
+## Releases
 
-https://hdis-pt.slack.com/
-
-## Document storage
-
-Google Drive
-Folder owner: Andres
+* [v0.1](https://tubcloud.tu-berlin.de/index.php/s/hL4ldj5D9rvADqp)
 
 ## Members
 
@@ -24,3 +19,12 @@ Vamsee Mithra Kilari | – | <kilari@campus.tu-berlin.de> | 0174 5945603
 
 * Thomas (Public Transport directions)
 * Andres (Walking directions)
+
+## Group Communication
+
+https://hdis-pt.slack.com/
+
+## Document storage
+
+Google Drive
+Folder owner: Andres
