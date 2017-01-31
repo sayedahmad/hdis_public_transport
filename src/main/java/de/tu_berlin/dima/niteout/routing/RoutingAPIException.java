@@ -85,9 +85,17 @@ public class RoutingAPIException extends Exception {
         return code;
     }
 
+
     public enum ErrorCode {
-        MISSING_KEYS,
-        INVALID_KEYS,
+
+        MISSING_KEYS("API keys were not set in the system properties of the running jvm instance"),
+        INVALID_KEYS("Some API key is invalid");
+
+        public final String message;
+
+        ErrorCode(String message) {
+            this.message = message;
+        }
 
     }
 }

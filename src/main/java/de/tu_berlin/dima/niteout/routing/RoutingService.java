@@ -2,7 +2,6 @@ package de.tu_berlin.dima.niteout.routing;
 
 import de.tu_berlin.dima.niteout.routing.model.*;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -60,7 +59,7 @@ public class RoutingService implements RoutingAPI {
      * @param destination The destination location
      * @return The travel time in seconds
      */
-    private int getWalkingTripTime(Location start, Location destination) throws IOException {
+    private int getWalkingTripTime(Location start, Location destination) throws RoutingAPIException {
 
         return getWalkingDirectionsAPI().getWalkingTripTime(start, destination);
     }
@@ -92,7 +91,7 @@ public class RoutingService implements RoutingAPI {
         return getPublicTransportAPI().getPublicTransportRouteSummary(start, destination, startTime);
     }
 
-    private RouteSummary getWalkingRouteSummary(Location start, Location destination, LocalDateTime startTime) throws IOException {
+    private RouteSummary getWalkingRouteSummary(Location start, Location destination, LocalDateTime startTime) throws RoutingAPIException {
 
         RouteSummary routeSummary = getWalkingDirectionsAPI().getWalkingRouteSummary(start, destination, startTime);
         return routeSummary;
@@ -101,7 +100,7 @@ public class RoutingService implements RoutingAPI {
     @Override
     public int getTripTime(TransportMode transportMode,
                            Location startLocation, Location destinationLocation,
-                           LocalDateTime startTime) throws IOException {
+                           LocalDateTime startTime) throws RoutingAPIException {
         switch (transportMode) {
 
             case PUBLIC_TRANSPORT:
@@ -118,7 +117,7 @@ public class RoutingService implements RoutingAPI {
     @Override
     public RouteSummary getRouteSummary(TransportMode transportMode,
                                         Location startLocation, Location destinationLocation,
-                                        LocalDateTime startTime) throws IOException {
+                                        LocalDateTime startTime) throws RoutingAPIException {
         switch (transportMode) {
 
             case PUBLIC_TRANSPORT:
@@ -135,7 +134,7 @@ public class RoutingService implements RoutingAPI {
     @Override
     public List<TimeMatrixEntry> getMatrix(TransportMode transportMode,
                                            Location[] startLocations, Location[] destinationLocations,
-                                           LocalDateTime startTime) throws IOException {
+                                           LocalDateTime startTime) throws RoutingAPIException {
         switch (transportMode) {
 
             case PUBLIC_TRANSPORT:

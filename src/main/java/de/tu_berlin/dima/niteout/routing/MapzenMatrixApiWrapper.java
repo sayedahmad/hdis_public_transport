@@ -116,7 +116,9 @@ class MapzenMatrixApiWrapper extends MapzenApi {
 
     }
 
-    public List<TimeMatrixEntry> getWalkingMatrix(Location[] startLocations, Location[] destinationLocations) throws IOException {
+    public List<TimeMatrixEntry> getWalkingMatrix(Location[] startLocations, Location[] destinationLocations) throws
+            RoutingAPIException {
+
         JsonArrayBuilder sourcesBuilder = Json.createArrayBuilder();
         JsonArrayBuilder targetsBuilder = Json.createArrayBuilder();
         for (Location source : startLocations) {
@@ -135,7 +137,7 @@ class MapzenMatrixApiWrapper extends MapzenApi {
         JsonObject response = null;
         try {
             response = this.getResponse(MatrixType.SOURCES_TO_TARGETS.getApiString(), requestJsonObject);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
             //TODO
         }

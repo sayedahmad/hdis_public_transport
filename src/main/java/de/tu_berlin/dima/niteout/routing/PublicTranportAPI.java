@@ -14,7 +14,8 @@ public interface PublicTranportAPI {
     Route getPublicTransportDirections(Location start, Location destination, LocalDateTime departure);
 
     List<TimeMatrixEntry> getMultiModalMatrix(Location[] startLocations, Location[] destinationLocations,
-                                              LocalDateTime departureTime);
+                                              LocalDateTime departureTime) throws RoutingAPIException;
 
-    RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime departure);
+    RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime departure)
+            throws RoutingAPIException;
 }
