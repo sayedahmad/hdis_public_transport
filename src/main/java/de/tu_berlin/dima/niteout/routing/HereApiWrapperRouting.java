@@ -41,7 +41,7 @@ import static java.util.stream.Collectors.toList;
  * The Wrapper for the here.com API which wraps the requesting and network logic and just returns simple objects of our
  * model that our Service can work with, to keep the dependencies of this API only inside this class.
  */
-class HereApiWrapper implements PublicTranportAPI {
+class HereApiWrapperRouting implements RoutingPublicTransportAPI {
 
     private final static String URL_MAIN = "https://route.cit.api.here.com/routing/7.2/calculateroute.json";
     private final static String URL_APP_ID = "app_id=%s";
@@ -59,7 +59,7 @@ class HereApiWrapper implements PublicTranportAPI {
     private final RateLimiter rateLimiter = RateLimiter.create(MAX_API_RPS); // TODO fine-tune RPS value
     private OkHttpClient httpClient;
 
-    public HereApiWrapper(String apiId, String apiCode) {
+    public HereApiWrapperRouting(String apiId, String apiCode) {
         if (apiId == null || apiId.trim().isEmpty() || apiCode == null || apiCode.trim().isEmpty()) {
             throw new IllegalArgumentException("apiId and apiCode cannot be null or empty");
         }

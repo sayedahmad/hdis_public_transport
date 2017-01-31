@@ -13,7 +13,7 @@ public class GeocodingService implements GeocodingAPI {
     GeocodingAPI provider = new MapzenSearchApiWrapper(System.getProperty("API_KEY_MAPZEN"));
 
     @Override
-    public Location getLocation(Address address) throws IOException {
+    public Location getLocation(Address address) throws RoutingAPIException {
         return provider.getLocation(address);
     }
 }

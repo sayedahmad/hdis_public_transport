@@ -8,7 +8,7 @@ import de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface PublicTranportAPI {
+public interface RoutingPublicTransportAPI {
     int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure);
 
     Route getPublicTransportDirections(Location start, Location destination, LocalDateTime departure);

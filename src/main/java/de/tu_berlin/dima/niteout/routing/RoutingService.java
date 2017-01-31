@@ -23,16 +23,16 @@ public class RoutingService implements RoutingAPI {
     }
 
 
-    private PublicTranportAPI publicTranportAPI;
+    private RoutingPublicTransportAPI routingPublicTransportAPI;
     private WalkingDirectionsAPI walkingDirectionsAPI;
 
     // API lazy initialization
-    private PublicTranportAPI getPublicTransportAPI() {
-        if (publicTranportAPI == null) {
+    private RoutingPublicTransportAPI getPublicTransportAPI() {
+        if (routingPublicTransportAPI == null) {
             // injection - TODO discuss if we use "proper" injection
-            publicTranportAPI = new HereApiWrapper(Settings.getHereApiAppID(), Settings.getHereApiAppCode());
+            routingPublicTransportAPI = new HereApiWrapperRouting(Settings.getHereApiAppID(), Settings.getHereApiAppCode());
         }
-        return publicTranportAPI;
+        return routingPublicTransportAPI;
     }
 
     private WalkingDirectionsAPI getWalkingDirectionsAPI() {

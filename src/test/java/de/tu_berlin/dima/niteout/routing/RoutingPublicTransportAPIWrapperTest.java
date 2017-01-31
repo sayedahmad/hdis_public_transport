@@ -12,21 +12,17 @@ import java.util.List;
 
 import static de.tu_berlin.dima.niteout.routing.LocationDirectory.ALEXANDERPLATZ;
 import static de.tu_berlin.dima.niteout.routing.LocationDirectory.BRANDENBURGER_TOR;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class PublicTranportAPIWrapperTest {
+public class RoutingPublicTransportAPIWrapperTest {
 
-    private static Location[] B_TOR_ARRAY_MANY = (Location[]) fillWith(new Location[500], BRANDENBURGER_TOR);
-    private static Location[] B_TOR_ARRAY_ONE = {BRANDENBURGER_TOR};
     private static BoundingBox BERLIN_MITTE = new BoundingBox(13.3295,52.4849, 13.4483, 52.5439);
 
-    private PublicTranportAPI api;
+    private RoutingPublicTransportAPI api;
 
     @Before
     public void init() {
-        api = new HereApiWrapper(System.getProperty("API_HERE_APP_ID"), System.getProperty("API_HERE_APP_CODE"));
+        api = new HereApiWrapperRouting(System.getProperty("API_HERE_APP_ID"), System.getProperty("API_HERE_APP_CODE"));
     }
 
     @Test
@@ -45,7 +41,12 @@ public class PublicTranportAPIWrapperTest {
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = LocationDirectory.getRandomLocation(BERLIN_MITTE);
         }
-        List<TimeMatrixEntry> list = api.getMultiModalMatrix(starts, destinations, LocalDateTime.now());
+        List<TimeMatrixEntry> list = null;
+        try {
+            list = api.getMultiModalMatrix(starts, destinations, LocalDateTime.now());
+        } catch (RoutingAPIException e) {
+            fail(e.getMessage());
+        }
         assertNotNull(list);
         assertTrue(list.size() > 0);
     }
@@ -62,7 +63,12 @@ public class PublicTranportAPIWrapperTest {
         // always next monday 12:37 to ensure there is traffic and the api call is in near future
         LocalDateTime time = LocalDateTime.now().withHour(12).withMinute(37).with(TemporalAdjusters.next(DayOfWeek.MONDAY));
 
-        RouteSummary routeSummary = api.getPublicTransportRouteSummary(BRANDENBURGER_TOR, ALEXANDERPLATZ,time);
+        RouteSummary routeSummary = null;
+        try {
+            routeSummary = api.getPublicTransportRouteSummary(BRANDENBURGER_TOR, ALEXANDERPLATZ,time);
+        } catch (RoutingAPIException e) {
+            fail(e.getMessage());
+        }
 
         assertNotNull(routeSummary);
         // test aggregated travel times map == duration

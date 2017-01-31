@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
  * A wrapper for the Mapzen Search API.
  * NOTE: This wrapper only implements the a subset of the functionality offered by the API
  * @author Andres Ardila
- * @see https://mapzen.com/products/search/
+ * see also https://mapzen.com/products/search/
  * 
  */
 class MapzenSearchApiWrapper extends MapzenApi implements GeocodingAPI {
@@ -25,7 +25,7 @@ class MapzenSearchApiWrapper extends MapzenApi implements GeocodingAPI {
     }
 
     @Override
-    public Location getLocation(Address address) throws IOException {
+    public Location getLocation(Address address) throws RoutingAPIException {
         LinkedHashMap<String, String> queryString = new LinkedHashMap<>();
         queryString.put("address", address.getStreet() + " " + address.getHouseNumber());
         queryString.put("locality", address.getCity());
@@ -37,7 +37,7 @@ class MapzenSearchApiWrapper extends MapzenApi implements GeocodingAPI {
         JsonObject responseJson = null;
         try {
             responseJson = super.getResponse(endpoint, queryString);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
             //TODO
         }
