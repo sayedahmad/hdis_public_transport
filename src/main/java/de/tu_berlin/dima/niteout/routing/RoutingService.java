@@ -87,7 +87,7 @@ public class RoutingService implements RoutingAPI {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    private RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime) {
+    private RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime) throws RoutingAPIException {
         return getPublicTransportAPI().getPublicTransportRouteSummary(start, destination, startTime);
     }
 
