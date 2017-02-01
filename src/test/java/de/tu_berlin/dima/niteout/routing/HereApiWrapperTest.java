@@ -1,7 +1,6 @@
 package de.tu_berlin.dima.niteout.routing;
 
 import de.tu_berlin.dima.niteout.routing.model.*;
-import de.tu_berlin.dima.niteout.routing.model.mapzen.Units;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,7 +8,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -17,11 +15,11 @@ import static de.tu_berlin.dima.niteout.routing.LocationDirectory.ALEXANDERPLATZ
 import static de.tu_berlin.dima.niteout.routing.LocationDirectory.BRANDENBURGER_TOR;
 import static org.junit.Assert.*;
 
-public class PublicTranportAPIWrapperTest {
+public class HereApiWrapperTest {
 
     private static BoundingBox BERLIN_MITTE = new BoundingBox(13.3295,52.4849, 13.4483, 52.5439);
 
-    private PublicTranportAPI api;
+    private HereApiWrapper api;
 
     @Before
     public void init() {
@@ -30,7 +28,7 @@ public class PublicTranportAPIWrapperTest {
 
     @Test
     public void getTimeTestFromBtorToAlex() {
-        int time = api.getPublicTransportTripTime(BRANDENBURGER_TOR, ALEXANDERPLATZ, LocalDateTime.now());
+        int time = api.getTripTime(BRANDENBURGER_TOR, ALEXANDERPLATZ, LocalDateTime.now());
         assertTrue(time > 300);
         assertTrue(time < 7200);
     }
@@ -47,7 +45,7 @@ public class PublicTranportAPIWrapperTest {
         }
         boolean[] indexed = new boolean[starts.length * destinations.length];
         long start = System.currentTimeMillis();
-        List<TimeMatrixEntry> list = api.getMultiModalMatrix(starts, destinations, LocalDateTime.now());
+        List<TimeMatrixEntry> list = api.getMatrix(starts, destinations, LocalDateTime.now());
         System.out.print("duration 50 calls: " + (System.currentTimeMillis() - start) + "ms");
         assertNotNull(list);
         assertEquals(list.size(), 50);
@@ -72,7 +70,7 @@ public class PublicTranportAPIWrapperTest {
         // always next monday 12:37 to ensure there is traffic at the departure time
         LocalDateTime time = LocalDateTime.now().withHour(12).withMinute(37).with(TemporalAdjusters.next(DayOfWeek.MONDAY));
 
-        RouteSummary routeSummary = api.getPublicTransportRouteSummary(BRANDENBURGER_TOR, ALEXANDERPLATZ,time);
+        RouteSummary routeSummary = api.getRouteSummary(BRANDENBURGER_TOR, ALEXANDERPLATZ,time);
 
         assertNotNull(routeSummary);
         // test aggregated travel times map == duration

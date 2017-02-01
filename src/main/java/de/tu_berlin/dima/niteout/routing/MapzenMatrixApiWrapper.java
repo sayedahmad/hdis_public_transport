@@ -10,6 +10,7 @@ import de.tu_berlin.dima.niteout.routing.model.mapzen.Units;
 import javax.json.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -235,4 +236,10 @@ class MapzenMatrixApiWrapper extends MapzenApi {
             return builder.build();
         }
     }
+
+	public List<TimeMatrixEntry> getWalkingMatrix(Location[] startLocations, Location[] destinationLocations,
+			LocalDateTime departureTime) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
 }

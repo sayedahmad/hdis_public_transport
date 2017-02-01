@@ -43,7 +43,7 @@ import static java.util.stream.Collectors.toList;
  * The Wrapper for the here.com API which wraps the requesting and network logic and just returns simple objects of our
  * model that our Service can work with, to keep the dependencies of this API only inside this class.
  */
-class HereApiWrapper implements PublicTranportAPI {
+class HereApiWrapper implements RoutingStrategy {
 
     private final static String URL_MAIN = "https://route.cit.api.here.com/routing/7.2/calculateroute.json";
     private final static String URL_APP_ID = "app_id=%s";
@@ -70,13 +70,12 @@ class HereApiWrapper implements PublicTranportAPI {
     }
 
     @Override
-    public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure) {
-        return getMatrixEntryForRouteArguments(0,0,start,destination,departure).getTime();
+    public int getTripTime(Location start, Location destination, LocalDateTime departure) {
+        return getMatrixEntryForRouteArguments(0, 0, start, destination, departure).getTime();
     }
 
     @Override
-    public List<TimeMatrixEntry> getMultiModalMatrix(Location[] startLocations, Location[] destinationLocations,
-                                                     LocalDateTime departureTime) {
+    public List<TimeMatrixEntry> getMatrix(Location[] startLocations, Location[] destinationLocations, LocalDateTime departureTime) {
 
         IntStream startIndices = IntStream.range(0, startLocations.length);
 
@@ -132,7 +131,7 @@ class HereApiWrapper implements PublicTranportAPI {
     }
 
     @Override
-    public RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime departure) {
+    public RouteSummary getRouteSummary(Location start, Location destination, LocalDateTime departure) {
         Reader responseReader = null;
         try {
             responseReader = getHTTPResponse(start, destination, departure);
@@ -262,4 +261,26 @@ class HereApiWrapper implements PublicTranportAPI {
     private static String formatParameter(boolean firstParameter, String parameterTemplate, Object... args) {
         return (firstParameter ? "?" : "&") + String.format(parameterTemplate, args);
     }
+
+	@Override
+	public TransportMode getTransportMode() {
+		throw new UnsupportedOperationException("Public Transport routing requires a start time");
+	}
+
+	@Override
+	public int getTripTime(Location startLocation, Location destinationLocation) throws IOException {
+		throw new UnsupportedOperationException("Public Transport routing requires a start time");
+	}
+
+	@Override
+	public RouteSummary getRouteSummary(Location start, Location destination) throws IOException {
+		throw new UnsupportedOperationException("Public Transport routing requires a start time");
+	}
+
+	@Override
+	public List<TimeMatrixEntry> getMatrix(Location[] startLocations, Location[] destinationLocations)
+			throws IOException {
+		
+		throw new UnsupportedOperationException("Public Transport routing requires a start time");
+	}
 }

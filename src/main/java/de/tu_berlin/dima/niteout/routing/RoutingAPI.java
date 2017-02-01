@@ -1,10 +1,13 @@
 package de.tu_berlin.dima.niteout.routing;
 
-import de.tu_berlin.dima.niteout.routing.model.*;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import de.tu_berlin.dima.niteout.routing.model.Location;
+import de.tu_berlin.dima.niteout.routing.model.RouteSummary;
+import de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry;
+import de.tu_berlin.dima.niteout.routing.model.TransportMode;
 
 
 public interface RoutingAPI {
