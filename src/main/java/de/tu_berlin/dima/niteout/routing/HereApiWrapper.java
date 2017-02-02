@@ -14,11 +14,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static java.util.stream.Collectors.toList;
 
 /*
@@ -54,6 +54,9 @@ class HereApiWrapper implements PublicTranportAPI {
     private final static String URL_MODE = "mode=fastest;publicTransport";
     private final static String URL_COMBINE_CHANGE = "combineChange=true";
     private final static double MAX_API_RPS = 1;
+
+
+    public final static DateTimeFormatter ISO_LOCAL_DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss");
 
     private final String apiId;
     private final String apiCode;
@@ -202,7 +205,7 @@ class HereApiWrapper implements PublicTranportAPI {
 
         // departure: route/summary/departure
         String departureAsISOString = route.getJsonObject("summary").getString("departure");
-        LocalDateTime departure = LocalDateTime.parse(departureAsISOString, ISO_OFFSET_DATE_TIME);
+        LocalDateTime departure = LocalDateTime.parse(departureAsISOString, ISO_LOCAL_DATE_TIME);
 
         // arrival: departure + travelTime
         LocalDateTime arrival = departure.plus(Duration.ofSeconds(duration));
@@ -246,7 +249,7 @@ class HereApiWrapper implements PublicTranportAPI {
                 formatParameter(URL_APP_CODE, apiCode) +
                 formatParameter(URL_START, start.getLatitude(), start.getLongitude()) +
                 formatParameter(URL_DESTINATION, destination.getLatitude(), destination.getLongitude()) +
-                formatParameter(URL_DEPARTURE, departure.toString()) +
+                formatParameter(URL_DEPARTURE, departure.format(ISO_LOCAL_DATE_TIME).replace('_', 'T')) +
                 formatParameter(URL_MODE) +
                 formatParameter(URL_COMBINE_CHANGE);
     }
