@@ -59,9 +59,10 @@ class HereWrapper implements PublicTransportWrapper {
     private final RateLimiter rateLimiter = RateLimiter.create(MAX_API_RPS); // TODO fine-tune RPS value
     private OkHttpClient httpClient;
 
-    public HereWrapper(String apiId, String apiCode) {
+    public HereWrapper(String apiId, String apiCode) throws RoutingAPIException {
         if (apiId == null || apiId.trim().isEmpty() || apiCode == null || apiCode.trim().isEmpty()) {
-            throw new IllegalArgumentException("apiId and apiCode cannot be null or empty");
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.API_CREDENTIALS_INVALID,
+                    "The api code or api id for here.com were either empty or not set or could not accessed.");
         }
         this.apiId = apiId;
         this.apiCode = apiCode;
@@ -177,7 +178,7 @@ class HereWrapper implements PublicTransportWrapper {
 
     }
 
-    private RouteSummary getRouteSummaryFromJsonResponse(JsonObject json) {
+    private RouteSummary getRouteSummaryFromJsonResponse(JsonObject json) throws RoutingAPIException {
         assert json != null;
 
         JsonObject route = json
@@ -205,7 +206,9 @@ class HereWrapper implements PublicTransportWrapper {
                         publicTransportTravelTime += travelTime;
                         break;
                     default:
-                        throw new IllegalStateException("Cannot handle transport type: " + type);
+                        throw new RoutingAPIException(RoutingAPIException.ErrorCode.DATA_SOURCE_RESPONSE_INVALID,
+                                "can not handle transport type ["
+                        + type + "] in response by here.com: \n" + route);
                 }
             }
         }

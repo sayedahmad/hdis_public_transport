@@ -88,9 +88,10 @@ public class RoutingAPIException extends Exception {
 
     public enum ErrorCode {
 
-        MISSING_KEYS("API keys were not set in the system properties of the running jvm instance"),
-        INVALID_KEYS("Some API key is invalid"),
-        UNKNOWN("Unkown error occurred");
+        UNKNOWN("Unkown error occurred"),
+        API_CREDENTIALS_INVALID("API credentials to request the data source were missing or invalid"),
+        DATA_SOURCE_RESPONSE_INVALID("The RoutingAPI could not handle the response from the server"),
+        INVALID_TRANSPORT_MODE("An invalid transport mode was requested to the RoutingAPI");
 
         public final String message;
 

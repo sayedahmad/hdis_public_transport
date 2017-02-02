@@ -2,6 +2,7 @@ package de.tu_berlin.dima.niteout.routing;
 
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
@@ -12,12 +13,21 @@ import java.time.LocalDateTime;
 public class MapzenMobilityApiWrapperTest {
 
     private final String apiKey = System.getProperty("API_KEY_MAPZEN");
+    private MapzenMobilityApiWrapper fixture;
 
+    @Before
+    public void setUpMapzenWrapper() {
+        try {
+            fixture = new MapzenMobilityApiWrapper(this.apiKey);
+        } catch (RoutingAPIException e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
 
     @Test
     public void getWalkingTripTime() {
 
-        MapzenMobilityApiWrapper fixture = new MapzenMobilityApiWrapper(this.apiKey);
         int tripDuration = 0;
 
         try {
@@ -33,7 +43,6 @@ public class MapzenMobilityApiWrapperTest {
     @Test
     public void getPublicTransportTripTime() {
 
-        MapzenMobilityApiWrapper fixture = new MapzenMobilityApiWrapper(this.apiKey);
         int tripDuration = 0;
 
         try {

@@ -25,12 +25,13 @@ class MapzenMobilityApiWrapper extends MapzenApi {
     private static final DateTimeFormatter ISO8601_DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("YYYY-MM-DD'T'HH:mm");
 
-    public MapzenMobilityApiWrapper(String apiKey) {
+    public MapzenMobilityApiWrapper(String apiKey) throws RoutingAPIException {
 
         super("valhalla", apiKey);
 
         if (apiKey == null || apiKey.trim().length() == 0)
-            throw new IllegalArgumentException("apiKey cannot be null or empty");
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.API_CREDENTIALS_INVALID,
+                    "The api key for mapzen was either empty or not set or could not accessed.");
     }
 
     public int getWalkingTripTime(Location start, Location destination) throws RoutingAPIException {

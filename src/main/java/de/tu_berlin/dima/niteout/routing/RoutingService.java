@@ -35,7 +35,7 @@ public class RoutingService implements RoutingAPI {
     private WalkingDirectionsAPI walkingDirectionsAPI;
 
     // API lazy initialization
-    private PublicTransportWrapper getPublicTransportAPI() {
+    private PublicTransportWrapper getPublicTransportAPI() throws RoutingAPIException {
         if (publicTransportWrapper == null) {
             // injection - TODO discuss if we use "proper" injection
             publicTransportWrapper = new HereWrapper(Settings.getHereApiAppID(), Settings.getHereApiAppCode());
@@ -74,39 +74,13 @@ public class RoutingService implements RoutingAPI {
         return getWalkingDirectionsAPI().getWalkingTripTime(start, destination);
     }
 
-    /**
-     * The turn-by-turn direction to travel from one location to another via Public Transport at a specific time
-     *
-     * @param start       The start location
-     * @param destination The destination location
-     * @param startTime   The time at which the journey will begin
-     * @return The Route containing the directions
-     */
-    private Route getPublicTransportDirections(Location start, Location destination, LocalDateTime startTime) {
-        // TODO do we have to implement this?
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    /**
-     * The turn-by-turn directions to travel from one location to another by foot
-     *
-     * @param start       The start location
-     * @param destination The destination location
-     * @return The Route containing the directions
-     */
-    private Route getWalkingDirections(Location start, Location destination) {
-        // TODO implement
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
     private RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime) throws RoutingAPIException {
         return getPublicTransportAPI().getPublicTransportRouteSummary(start, destination, startTime);
     }
 
     private RouteSummary getWalkingRouteSummary(Location start, Location destination, LocalDateTime startTime) throws RoutingAPIException {
 
-        RouteSummary routeSummary = getWalkingDirectionsAPI().getWalkingRouteSummary(start, destination, startTime);
-        return routeSummary;
+        return getWalkingDirectionsAPI().getWalkingRouteSummary(start, destination, startTime);
     }
 
     @Override
@@ -122,7 +96,7 @@ public class RoutingService implements RoutingAPI {
                 return this.getWalkingTripTime(startLocation, destinationLocation);
 
             default:
-                throw new IllegalArgumentException("transportMode");
+                throw createInvalidTransportModeException(transportMode);
         }
     }
 
@@ -139,7 +113,7 @@ public class RoutingService implements RoutingAPI {
                 return this.getWalkingRouteSummary(startLocation, destinationLocation, startTime);
 
             default:
-                throw new IllegalArgumentException("transportMode");
+                throw createInvalidTransportModeException(transportMode);
         }
     }
 
@@ -156,7 +130,13 @@ public class RoutingService implements RoutingAPI {
                 return getWalkingDirectionsAPI().getWalkingMatrix(startLocations, destinationLocations);
 
             default:
-                throw new IllegalArgumentException("transportMode");
+                throw createInvalidTransportModeException(transportMode);
         }
+    }
+
+    private RoutingAPIException createInvalidTransportModeException(TransportMode transportMode) {
+        return new RoutingAPIException(RoutingAPIException.ErrorCode.INVALID_TRANSPORT_MODE, "Can not request" +
+                " for transport mode [" + transportMode + "]. Only " + TransportMode.PUBLIC_TRANSPORT +
+                " and " + TransportMode.WALKING + " are available.");
     }
 }

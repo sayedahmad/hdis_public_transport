@@ -22,7 +22,12 @@ public class PublicTransportWrapperTest {
 
     @Before
     public void init() {
-        api = new HereWrapper(System.getProperty("API_HERE_APP_ID"), System.getProperty("API_HERE_APP_CODE"));
+        try {
+            api = new HereWrapper(System.getProperty("API_HERE_APP_ID"), System.getProperty("API_HERE_APP_CODE"));
+        } catch (RoutingAPIException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
     }
 
     @Test

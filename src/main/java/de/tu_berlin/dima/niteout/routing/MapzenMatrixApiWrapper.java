@@ -23,12 +23,13 @@ class MapzenMatrixApiWrapper extends MapzenApi {
     private final Units MapzenDistanceUnits = Units.KM;
     private final DistanceUnits MatrixDistanceUnits = DistanceUnits.KILOMETERS;
 
-    public MapzenMatrixApiWrapper(String apiKey) {
+    public MapzenMatrixApiWrapper(String apiKey) throws RoutingAPIException {
 
         super("matrix", apiKey);
 
         if (apiKey == null || apiKey.trim().length() == 0)
-            throw new IllegalArgumentException("apiKey cannot be null or empty");
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.API_CREDENTIALS_INVALID,
+                    "The api key for mapzen was either empty or not set or could not accessed.");
     }
 
     /**
