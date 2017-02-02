@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static java.util.stream.Collectors.toList;
 
 /*
@@ -205,7 +206,7 @@ class HereApiWrapper implements PublicTranportAPI {
 
         // departure: route/summary/departure
         String departureAsISOString = route.getJsonObject("summary").getString("departure");
-        LocalDateTime departure = LocalDateTime.parse(departureAsISOString, ISO_LOCAL_DATE_TIME);
+        LocalDateTime departure = LocalDateTime.parse(departureAsISOString, ISO_OFFSET_DATE_TIME);
 
         // arrival: departure + travelTime
         LocalDateTime arrival = departure.plus(Duration.ofSeconds(duration));
