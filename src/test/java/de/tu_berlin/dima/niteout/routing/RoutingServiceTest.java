@@ -2,7 +2,6 @@ package de.tu_berlin.dima.niteout.routing;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 import org.junit.Assert;
@@ -24,7 +23,7 @@ public class RoutingServiceTest {
             tripTime = fixture.getTripTime(TransportMode.WALKING,
                     LocationDirectory.TU_BERLIN, LocationDirectory.SIEGESSAEULE,
                     LocalDateTime.now());
-        } catch (IOException e) {
+        } catch (RoutingAPIException e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
         }
@@ -52,7 +51,7 @@ public class RoutingServiceTest {
             //check that the departure time plus the duration is about the same as the arrival time
             Assert.assertTrue(
             		MINUTES.between(now.plusSeconds(routeSummary.getTotalDuration()),routeSummary.getArrivalTime()) <= 1);
-        } catch (IOException e) {
+        } catch (RoutingAPIException e) {
             e.printStackTrace();
             Assert.fail();
         }

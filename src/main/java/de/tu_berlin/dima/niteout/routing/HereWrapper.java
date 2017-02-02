@@ -41,7 +41,7 @@ import static java.util.stream.Collectors.toList;
  * The Wrapper for the here.com API which wraps the requesting and network logic and just returns simple objects of our
  * model that our Service can work with, to keep the dependencies of this API only inside this class.
  */
-class HereApiWrapperRouting implements RoutingPublicTransportAPI {
+class HereWrapper implements PublicTransportWrapper {
 
     private final static String URL_MAIN = "https://route.cit.api.here.com/routing/7.2/calculateroute.json";
     private final static String URL_APP_ID = "app_id=%s";
@@ -59,7 +59,7 @@ class HereApiWrapperRouting implements RoutingPublicTransportAPI {
     private final RateLimiter rateLimiter = RateLimiter.create(MAX_API_RPS); // TODO fine-tune RPS value
     private OkHttpClient httpClient;
 
-    public HereApiWrapperRouting(String apiId, String apiCode) {
+    public HereWrapper(String apiId, String apiCode) {
         if (apiId == null || apiId.trim().isEmpty() || apiCode == null || apiCode.trim().isEmpty()) {
             throw new IllegalArgumentException("apiId and apiCode cannot be null or empty");
         }
@@ -69,18 +69,16 @@ class HereApiWrapperRouting implements RoutingPublicTransportAPI {
     
 
     @Override
-    public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure) {
+    public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure) throws RoutingAPIException {
         return getMatrixEntryForRouteArguments(0,0,start,destination,departure).getTime();
     }
 
     @Override
-    public Route getPublicTransportDirections(Location start, Location destination, LocalDateTime departure) {
+    public Route getPublicTransportDirections(Location start, Location destination, LocalDateTime departure) throws
+            RoutingAPIException {
+
         Reader responseReader = null;
-        try {
-            responseReader = getHTTPResponse(start, destination, departure);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        responseReader = getHTTPResponse(start, destination, departure);
         JsonObject json = null;
 
         try {
@@ -101,32 +99,44 @@ class HereApiWrapperRouting implements RoutingPublicTransportAPI {
 
     @Override
     public List<TimeMatrixEntry> getMultiModalMatrix(Location[] startLocations, Location[] destinationLocations,
-                                                     LocalDateTime departureTime) {
+                                                     LocalDateTime departureTime) throws RoutingAPIException {
 
         IntStream startIndices = IntStream.range(0, startLocations.length - 1);
 
         // Parallelize all start locations, map each of them to all destination locations and get a MatrixEntry for
         // each combination. Then collect them again to a single list and return it.
         // TODO check parallelism, now it just depends on startDestinations and does not scale for 1-n
-        return startIndices.parallel()
-                .mapToObj(i -> IntStream.range(0, destinationLocations.length - 1)
-                        .mapToObj(j ->
-                                getMatrixEntryForRouteArguments(i, j, startLocations[i], destinationLocations[j], departureTime))
-                        .collect(toList()))
-                .flatMap(l -> l.stream())
-                .collect(toList());
+
+        List<TimeMatrixEntry> matrix = null;
+
+        try {
+            // TODO prettify
+            matrix = startIndices.parallel()
+                    .mapToObj(i -> IntStream.range(0, destinationLocations.length - 1)
+                            .mapToObj(j -> {
+                                try {
+                                    return getMatrixEntryForRouteArguments(i, j, startLocations[i], destinationLocations[j], departureTime);
+                                } catch (RoutingAPIException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            })
+                            .collect(toList()))
+                    .flatMap(l -> l.stream())
+                    .collect(toList());
+        } catch (RuntimeException e) {
+            if (e.getCause() != null && e.getCause() instanceof RoutingAPIException) {
+                throw (RoutingAPIException) e.getCause();
+            }
+            throw e;
+        }
+
+        return matrix;
     }
 
     private TimeMatrixEntry getMatrixEntryForRouteArguments(int fromIndex, int toIndex, Location start, Location destination,
-                                                            LocalDateTime departure) {
+                                                            LocalDateTime departure) throws RoutingAPIException {
 
-        System.out.println(LocalDateTime.now() + ":: request  #" + toIndex + ":" + fromIndex);
-        Reader response = null;
-        try {
-            response = getHTTPResponse(start, destination, departure);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Reader response = getHTTPResponse(start, destination, departure);
         JsonObject json = null;
 
         try {
@@ -153,13 +163,8 @@ class HereApiWrapperRouting implements RoutingPublicTransportAPI {
     }
 
     @Override
-    public RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime departure) {
-        Reader responseReader = null;
-        try {
-            responseReader = getHTTPResponse(start, destination, departure);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime departure) throws RoutingAPIException {
+        Reader responseReader = getHTTPResponse(start, destination, departure);
         JsonObject json = null;
 
         try {
@@ -232,7 +237,7 @@ class HereApiWrapperRouting implements RoutingPublicTransportAPI {
 
     }
 
-    private Reader getHTTPResponse(Location start, Location destination, LocalDateTime departure) throws IOException {
+    private Reader getHTTPResponse(Location start, Location destination, LocalDateTime departure) throws RoutingAPIException {
         String url = buildURL(start, destination, departure.withNano(0));
 
         System.out.println("call URL " + url);
@@ -243,8 +248,15 @@ class HereApiWrapperRouting implements RoutingPublicTransportAPI {
 
         //Acquire a ticket from the rate limiter
         rateLimiter.acquire();
-        Response response = getHTTPClient().newCall(request).execute();
-        
+        Response response = null;
+        try {
+            response = getHTTPClient().newCall(request).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+            // TODO
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.UNKNOWN, e);
+        }
+
         return response.body().charStream();
     }
 

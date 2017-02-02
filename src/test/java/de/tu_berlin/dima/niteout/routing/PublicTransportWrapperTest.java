@@ -14,20 +14,26 @@ import static de.tu_berlin.dima.niteout.routing.LocationDirectory.ALEXANDERPLATZ
 import static de.tu_berlin.dima.niteout.routing.LocationDirectory.BRANDENBURGER_TOR;
 import static org.junit.Assert.*;
 
-public class RoutingPublicTransportAPIWrapperTest {
+public class PublicTransportWrapperTest {
 
     private static BoundingBox BERLIN_MITTE = new BoundingBox(13.3295,52.4849, 13.4483, 52.5439);
 
-    private RoutingPublicTransportAPI api;
+    private PublicTransportWrapper api;
 
     @Before
     public void init() {
-        api = new HereApiWrapperRouting(System.getProperty("API_HERE_APP_ID"), System.getProperty("API_HERE_APP_CODE"));
+        api = new HereWrapper(System.getProperty("API_HERE_APP_ID"), System.getProperty("API_HERE_APP_CODE"));
     }
 
     @Test
     public void getTimeTest() {
-        int time = api.getPublicTransportTripTime(BRANDENBURGER_TOR, ALEXANDERPLATZ, LocalDateTime.now());
+        int time = 0;
+        try {
+            time = api.getPublicTransportTripTime(BRANDENBURGER_TOR, ALEXANDERPLATZ, LocalDateTime.now());
+        } catch (RoutingAPIException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
         assertTrue(time > 0);
     }
 
@@ -49,13 +55,6 @@ public class RoutingPublicTransportAPIWrapperTest {
         }
         assertNotNull(list);
         assertTrue(list.size() > 0);
-    }
-
-    private static Object[] fillWith(Object[] array, Object filler) {
-        for (int i = 0; i < array.length; i++) {
-            array[i] = filler;
-        }
-        return array;
     }
 
     @Test

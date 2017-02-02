@@ -8,9 +8,6 @@ import java.util.List;
 
 public interface RoutingAPI {
 
-    //int getPublicTransportTripTime(Location start, Location destination, LocalDateTime startTime);
-    //int getWalkingTripTime(Location start, Location destination) throws IOException;
-
 	/**
 	 * Get the amount of time (in seconds) to travel between two locations with the specified transport mode (e.g. walking)
 	 * @param transportMode the mode of transport for the trip (e.g. walking, public transport)
@@ -24,12 +21,6 @@ public interface RoutingAPI {
                     Location startLocation, Location destinationLocation,
                     LocalDateTime startTime) throws RoutingAPIException;
 
-
-    //Route getPublicTransportDirections(Location start, Location destination, LocalDateTime startTime);
-    //Route getWalkingDirections(Location start, Location destination);
-
-    //RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime);
-    //RouteSummary getWalkingRouteSummary(Location start, Location destination);
 
     /**
      * Gets the summary details about a route between two locations with the specified transport mode (e.g. walking) 

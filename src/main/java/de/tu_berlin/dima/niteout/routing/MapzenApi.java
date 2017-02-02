@@ -31,20 +31,41 @@ abstract class MapzenApi {
         this.apiKey = apiKey;
     }
 
-    protected JsonObject getResponse(String endpoint, JsonObject jsonObject) throws IOException, URISyntaxException {
-        final String url = getUrl(endpoint, jsonObject);
-        return getResponse(url);
+    protected JsonObject getResponse(String endpoint, JsonObject jsonObject) throws RoutingAPIException {
+        final String url;
+        try {
+            url = getUrl(endpoint, jsonObject);
+            return getResponse(url);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            // TODO
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.UNKNOWN, e);
+        }
     }
 
-    protected JsonObject getResponse(String endpoint, LinkedHashMap<String, String> queryString) throws IOException, URISyntaxException {
-        final String url = getUrl(endpoint, queryString);
-        return getResponse(url);
+    protected JsonObject getResponse(String endpoint, LinkedHashMap<String, String> queryString) throws RoutingAPIException {
+        final String url;
+        try {
+            url = getUrl(endpoint, queryString);
+            return getResponse(url);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            // TODO
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.UNKNOWN, e);
+        }
     }
 
-    private JsonObject getResponse(String url) throws IOException {
+    private JsonObject getResponse(String url) throws RoutingAPIException {
         OkHttpClient httpClient = new OkHttpClient();
         Request request = new Request.Builder().url(url).build();
-        Response response = httpClient.newCall(request).execute();
+        Response response;
+        try {
+            response = httpClient.newCall(request).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+            // TODO
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.UNKNOWN, e);
+        }
         JsonReader jsonReader = Json.createReader(response.body().charStream());
         JsonObject out = jsonReader.readObject();
 

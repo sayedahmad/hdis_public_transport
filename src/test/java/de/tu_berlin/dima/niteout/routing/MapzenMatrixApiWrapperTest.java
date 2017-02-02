@@ -34,7 +34,7 @@ public class MapzenMatrixApiWrapperTest {
             List<TimeMatrixEntry> matrix = fixture.getWalkingMatrix(start, destinations);
             Assert.assertEquals(destinations.length, matrix.size());
 
-        } catch (IOException e) {
+        } catch (RoutingAPIException e) {
             e.printStackTrace();
             Assert.fail();
         }
@@ -58,7 +58,7 @@ public class MapzenMatrixApiWrapperTest {
             List<TimeMatrixEntry> matrix = fixture.getWalkingMatrix(startLocations, destination);
             Assert.assertEquals(startLocations.length, matrix.size());
 
-        } catch (IOException e) {
+        } catch (RoutingAPIException e) {
             e.printStackTrace();
             Assert.fail();
         }
@@ -83,7 +83,7 @@ public class MapzenMatrixApiWrapperTest {
             List<TimeMatrixEntry> matrix = fixture.getWalkingMatrix(locations);
             Assert.assertEquals((int)Math.pow(locations.length, 2), matrix.size());
 
-        } catch (IOException e) {
+        } catch (RoutingAPIException e) {
             e.printStackTrace();
             Assert.fail();
         }
@@ -112,7 +112,7 @@ public class MapzenMatrixApiWrapperTest {
             List<TimeMatrixEntry> matrix = fixture.getWalkingMatrix(startLocations, destinations);
             Assert.assertEquals(startLocations.length * destinations.length, matrix.size());
 
-        } catch (IOException e) {
+        } catch (RoutingAPIException e) {
             e.printStackTrace();
             Assert.fail();
         }

@@ -36,23 +36,15 @@ class MapzenMatrixApiWrapper extends MapzenApi {
      * @param start the starting location
      * @param destinations the list of destinations
      * @return the time matrix
-     * @throws IOException
      */
-    public List<TimeMatrixEntry> getWalkingMatrix(Location start, Location[] destinations) throws IOException {
+    public List<TimeMatrixEntry> getWalkingMatrix(Location start, Location[] destinations) throws RoutingAPIException {
 
         JsonBuilder jsonBuilder = new JsonBuilder();
         jsonBuilder.addLocation(start);
         jsonBuilder.addLocations(destinations);
         JsonObject requestJsonObject = jsonBuilder.build(this.MapzenDistanceUnits);
 
-        JsonObject response = null;
-        try {
-            response = super.getResponse(MatrixType.ONE_TO_MANY.getApiString(), requestJsonObject);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            //TODO
-        }
-        //TODO check for error(s) in response
+        JsonObject response = super.getResponse(MatrixType.ONE_TO_MANY.getApiString(), requestJsonObject);
 
         JsonArray outerArray = response.getJsonArray(MatrixType.ONE_TO_MANY.getApiString());
         JsonArray innerArray = outerArray.getJsonArray(0);
@@ -78,23 +70,15 @@ class MapzenMatrixApiWrapper extends MapzenApi {
     }
 
     public List<TimeMatrixEntry> getWalkingMatrix(
-            Location[] startLocations, Location destinationLocation)
-            throws IOException {
+            Location[] startLocations, Location destinationLocation) throws RoutingAPIException {
 
         JsonBuilder jsonBuilder = new JsonBuilder();
         jsonBuilder.addLocations(startLocations);
         jsonBuilder.addLocation(destinationLocation);
         JsonObject requestJsonObject = jsonBuilder.build(this.MapzenDistanceUnits);
 
-        JsonObject response = null;
-        try {
-            response = this.getResponse(MatrixType.MANY_TO_ONE.getApiString(), requestJsonObject);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            //TODO
-        }
-        //TODO check for error(s) in response
-        
+        JsonObject response = this.getResponse(MatrixType.MANY_TO_ONE.getApiString(), requestJsonObject);
+
         ArrayList<TimeMatrixEntry> out = new ArrayList<>(startLocations.length);
 
         for (JsonValue jsonValue : response.getJsonArray(MatrixType.MANY_TO_ONE.getApiString())) {
@@ -135,14 +119,8 @@ class MapzenMatrixApiWrapper extends MapzenApi {
                 .build();
 
         JsonObject response = null;
-        try {
-            response = this.getResponse(MatrixType.SOURCES_TO_TARGETS.getApiString(), requestJsonObject);
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-            //TODO
-        }
-        //TODO check for error(s) in response
-        
+        response = this.getResponse(MatrixType.SOURCES_TO_TARGETS.getApiString(), requestJsonObject);
+
         JsonArray outerArray = response.getJsonArray(MatrixType.SOURCES_TO_TARGETS.getApiString());
         ArrayList<TimeMatrixEntry> out = new ArrayList<>();
 
@@ -171,21 +149,15 @@ class MapzenMatrixApiWrapper extends MapzenApi {
                 .build();
     }
 
-    public List<TimeMatrixEntry> getWalkingMatrix(Location[] locations) throws IOException {
+    public List<TimeMatrixEntry> getWalkingMatrix(Location[] locations) throws RoutingAPIException {
         JsonBuilder jsonBuilder = new JsonBuilder();
         jsonBuilder.addLocations(locations);
         JsonObject requestJsonObject = jsonBuilder.build(this.MapzenDistanceUnits);
 
         JsonObject response = null;
-        try {
-            response = this.getResponse(MatrixType.MANY_TO_MANY.getApiString(), requestJsonObject);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            //TODO
-        }
+        response = this.getResponse(MatrixType.MANY_TO_MANY.getApiString(), requestJsonObject);
 
-        //TODO check for error(s) in response
-        
+
         ArrayList<TimeMatrixEntry> out = new ArrayList<>();
 
         for (JsonValue innerValue : response.getJsonArray(MatrixType.MANY_TO_MANY.getApiString())) {

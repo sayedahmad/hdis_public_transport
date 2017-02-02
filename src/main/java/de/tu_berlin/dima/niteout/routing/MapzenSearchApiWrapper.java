@@ -5,8 +5,6 @@ import de.tu_berlin.dima.niteout.routing.model.Location;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 
 /**
@@ -34,13 +32,7 @@ class MapzenSearchApiWrapper extends MapzenApi implements GeocodingAPI {
         queryString.put("size", "1");
         queryString.put("api_key", super.apiKey);
 
-        JsonObject responseJson = null;
-        try {
-            responseJson = super.getResponse(endpoint, queryString);
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-            //TODO
-        }
+        JsonObject responseJson = super.getResponse(endpoint, queryString);
         JsonArray features = responseJson.getJsonArray("features");
 
         Location location = null;

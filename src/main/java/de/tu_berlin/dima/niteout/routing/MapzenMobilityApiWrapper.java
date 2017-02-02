@@ -145,14 +145,7 @@ class MapzenMobilityApiWrapper extends MapzenApi {
 
         JsonObject json = jsonObjectBuilder.build();
 
-        JsonObject responseJsonObject = null;
-
-        try {
-            responseJsonObject = super.getResponse("route", json);
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-            //TODO
-        }
+        JsonObject responseJsonObject = super.getResponse("route", json);
 
         return responseJsonObject;
     }
