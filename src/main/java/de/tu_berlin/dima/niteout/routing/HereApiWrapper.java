@@ -57,7 +57,7 @@ class HereApiWrapper implements PublicTranportAPI {
     private final static double MAX_API_RPS = 1;
 
 
-    public final static DateTimeFormatter ISO_LOCAL_DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss");
+    public final static DateTimeFormatter ISO_LOCAL_DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     private final String apiId;
     private final String apiCode;
@@ -250,7 +250,7 @@ class HereApiWrapper implements PublicTranportAPI {
                 formatParameter(URL_APP_CODE, apiCode) +
                 formatParameter(URL_START, start.getLatitude(), start.getLongitude()) +
                 formatParameter(URL_DESTINATION, destination.getLatitude(), destination.getLongitude()) +
-                formatParameter(URL_DEPARTURE, departure.format(ISO_LOCAL_DATE_TIME).replace('_', 'T')) +
+                formatParameter(URL_DEPARTURE, departure.format(ISO_LOCAL_DATE_TIME)) +
                 formatParameter(URL_MODE) +
                 formatParameter(URL_COMBINE_CHANGE);
     }

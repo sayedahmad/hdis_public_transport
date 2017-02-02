@@ -16,7 +16,7 @@ public class LocalDateTimeTest {
     public void localDateTimeWithoutSecondsToStringShouldReturnStringContainingSeconds() {
         // fails: String date = LocalDateTime.now().withSecond(0).withNano(0).toString();
         // fails: String date = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        String date = LocalDateTime.now().format(HereApiWrapper.ISO_LOCAL_DATE_TIME).replace('_', 'T');
+        String date = LocalDateTime.now().format(HereApiWrapper.ISO_LOCAL_DATE_TIME);
         assertEquals(date.length(), 19);
     }
 }
