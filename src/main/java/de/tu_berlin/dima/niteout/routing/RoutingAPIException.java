@@ -88,10 +88,11 @@ public class RoutingAPIException extends Exception {
 
     public enum ErrorCode {
 
-        UNKNOWN("Unkown error occurred"),
         API_CREDENTIALS_INVALID("API credentials to request the data source were missing or invalid"),
         DATA_SOURCE_RESPONSE_INVALID("The RoutingAPI could not handle the response from the server"),
-        INVALID_TRANSPORT_MODE("An invalid transport mode was requested to the RoutingAPI");
+        INVALID_TRANSPORT_MODE("An invalid transport mode was requested to the RoutingAPI"),
+        INVALID_URI_SYNTAX("Could not build a valid URI"),
+        HTTP("Something went wrong when requesting the api, see chained exception");
 
         public final String message;
 

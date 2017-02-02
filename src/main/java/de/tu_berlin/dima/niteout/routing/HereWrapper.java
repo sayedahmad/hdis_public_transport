@@ -35,7 +35,6 @@ import static java.util.stream.Collectors.toList;
  * &mode=fastest;publicTransport
  * &combineChange=true
  */
-// TODO add more comments, document methods
 
 /**
  * The Wrapper for the here.com API which wraps the requesting and network logic and just returns simple objects of our
@@ -255,9 +254,7 @@ class HereWrapper implements PublicTransportWrapper {
         try {
             response = getHTTPClient().newCall(request).execute();
         } catch (IOException e) {
-            e.printStackTrace();
-            // TODO
-            throw new RoutingAPIException(RoutingAPIException.ErrorCode.UNKNOWN, e);
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.HTTP, e);
         }
 
         return response.body().charStream();

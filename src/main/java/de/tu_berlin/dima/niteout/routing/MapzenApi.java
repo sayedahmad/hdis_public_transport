@@ -37,9 +37,7 @@ abstract class MapzenApi {
             url = getUrl(endpoint, jsonObject);
             return getResponse(url);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
-            // TODO
-            throw new RoutingAPIException(RoutingAPIException.ErrorCode.UNKNOWN, e);
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.INVALID_URI_SYNTAX, e);
         }
     }
 
@@ -49,9 +47,7 @@ abstract class MapzenApi {
             url = getUrl(endpoint, queryString);
             return getResponse(url);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
-            // TODO
-            throw new RoutingAPIException(RoutingAPIException.ErrorCode.UNKNOWN, e);
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.INVALID_URI_SYNTAX, e);
         }
     }
 
@@ -62,9 +58,7 @@ abstract class MapzenApi {
         try {
             response = httpClient.newCall(request).execute();
         } catch (IOException e) {
-            e.printStackTrace();
-            // TODO
-            throw new RoutingAPIException(RoutingAPIException.ErrorCode.UNKNOWN, e);
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.HTTP, e);
         }
         JsonReader jsonReader = Json.createReader(response.body().charStream());
         JsonObject out = jsonReader.readObject();
