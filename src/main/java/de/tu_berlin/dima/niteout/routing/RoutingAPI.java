@@ -17,8 +17,7 @@ public interface RoutingAPI {
 	 * @return the total number of seconds required for the trip 
      * @throws RoutingAPIException which contains an identifier of the error
 	 */
-    int getTripTime(TransportMode transportMode,
-                    Location startLocation, Location destinationLocation,
+    int getTripTime(TransportMode transportMode, Location startLocation, Location destinationLocation,
                     LocalDateTime startTime) throws RoutingAPIException;
 
 

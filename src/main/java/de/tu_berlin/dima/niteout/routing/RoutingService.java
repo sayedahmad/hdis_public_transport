@@ -74,7 +74,8 @@ public class RoutingService implements RoutingAPI {
         return getWalkingDirectionsAPI().getWalkingTripTime(start, destination);
     }
 
-    private RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime) throws RoutingAPIException {
+    private RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime)
+            throws RoutingAPIException {
         return getPublicTransportAPI().getPublicTransportRouteSummary(start, destination, startTime);
     }
 
