@@ -10,7 +10,6 @@ import java.io.*;
 import java.net.*;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import javax.json.*;
 
@@ -21,9 +20,6 @@ import javax.json.*;
  * @author Andres Ardila
  */
 class MapzenMobilityApiWrapper extends MapzenApi {
-
-    private static final DateTimeFormatter ISO8601_DATE_TIME_FORMATTER =
-            DateTimeFormatter.ofPattern("YYYY-MM-DD'T'HH:mm");
 
     public MapzenMobilityApiWrapper(String apiKey) {
 
@@ -80,16 +76,17 @@ class MapzenMobilityApiWrapper extends MapzenApi {
         JsonObject startLocation = (JsonObject)locations.get(0);
         JsonObject arrivalLocation = (JsonObject)locations.get(1);
 
-        //HACK there is a bug whereby timezones w/ negative UTC offsets are not formatted correctly
+        //HACK there is a bug whereby time zones w/ negative UTC offsets are not formatted correctly
         //instead of the correct HH:MM:SS+01:00, it returns HH:MM:SS01:00
         //see https://github.com/valhalla/valhalla/issues/13
         String departureDateTimeString = startLocation.getString("date_time");
         //check if the bug is still there in case they fix it
-        if (departureDateTimeString.charAt(16) != '+') {
+        if (testForMapzenDateTimeFormatBug(departureDateTimeString)) {
             departureDateTimeString = fixDateTimeString(departureDateTimeString);
         }
+        
         String arrivalDateTimeString = arrivalLocation.getString("date_time");
-        if (arrivalDateTimeString.charAt(16) != '+') {
+        if (testForMapzenDateTimeFormatBug(arrivalDateTimeString)) {
             arrivalDateTimeString = fixDateTimeString(arrivalDateTimeString);
         }
         
@@ -107,6 +104,15 @@ class MapzenMobilityApiWrapper extends MapzenApi {
         routeSummary.setModeOfTransportTravelTimes(hashMap);
 
         return routeSummary;
+    }
+    
+    /**
+     * Checks that the bug described in https://github.com/valhalla/valhalla/issues/13 is present in the returned date/time string
+     * @param dateTimeString the date/time string to test as returned by the Mapzen API
+     * @return true when the bug was found to be present, false if not
+     */
+    private boolean testForMapzenDateTimeFormatBug(String dateTimeString) {
+    	return (dateTimeString.charAt(16) != '+');
     }
 
     /**
@@ -138,9 +144,12 @@ class MapzenMobilityApiWrapper extends MapzenApi {
 
         if (departureTime != null) {
 
+            //Remove seconds & below
+            //{"error_code":162,"error":"Date and time is invalid.  Format is YYYY-MM-DDTHH:MM","status_code":400,"status":"Bad Request"}
+        	
             jsonObjectBuilder.add("date_time", Json.createObjectBuilder()
                     .add("type", 1)
-                    .add("value", departureTime.format(ISO8601_DATE_TIME_FORMATTER)));
+                    .add("value", departureTime.format(DateTimeFormatters.ISO_LOCAL_DATE_TIME_NO_SECONDS)));
         }
 
         JsonObject json = jsonObjectBuilder.build();

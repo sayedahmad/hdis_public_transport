@@ -3,6 +3,7 @@ package de.tu_berlin.dima.niteout.routing;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,7 +17,10 @@ public class LocalDateTimeTest {
     public void localDateTimeWithoutSecondsToStringShouldReturnStringContainingSeconds() {
         // fails: String date = LocalDateTime.now().withSecond(0).withNano(0).toString();
         // fails: String date = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        String date = LocalDateTime.now().format(HereApiWrapper.ISO_LOCAL_DATE_TIME);
+        String date = LocalDateTime.now().withNano(0).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        assertEquals(date.length(), 19);
+
+        date = LocalDateTime.now().format(DateTimeFormatters.ISO_LOCAL_DATE_TIME_NO_NANOSECONDS);
         assertEquals(date.length(), 19);
     }
 }

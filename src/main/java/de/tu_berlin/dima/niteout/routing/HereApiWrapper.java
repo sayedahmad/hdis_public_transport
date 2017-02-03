@@ -56,9 +56,6 @@ class HereApiWrapper implements PublicTranportAPI {
     private final static String URL_COMBINE_CHANGE = "combineChange=true";
     private final static double MAX_API_RPS = 1;
 
-
-    public final static DateTimeFormatter ISO_LOCAL_DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-
     private final String apiId;
     private final String apiCode;
 
@@ -74,8 +71,8 @@ class HereApiWrapper implements PublicTranportAPI {
     }
 
     @Override
-    public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure) {
-        return getMatrixEntryForRouteArguments(0,0,start,destination,departure).getTime();
+    public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departureTime) {
+        return getMatrixEntryForRouteArguments(0, 0, start, destination, departureTime).getTime();
     }
 
     @Override
@@ -229,7 +226,7 @@ class HereApiWrapper implements PublicTranportAPI {
     }
 
     private Reader getHTTPResponse(Location start, Location destination, LocalDateTime departure) throws IOException {
-        String url = buildURL(start, destination, departure.withNano(0));
+        String url = buildURL(start, destination, departure);
 
         System.out.println("call URL " + url);
 
@@ -250,7 +247,7 @@ class HereApiWrapper implements PublicTranportAPI {
                 formatParameter(URL_APP_CODE, apiCode) +
                 formatParameter(URL_START, start.getLatitude(), start.getLongitude()) +
                 formatParameter(URL_DESTINATION, destination.getLatitude(), destination.getLongitude()) +
-                formatParameter(URL_DEPARTURE, departure.format(ISO_LOCAL_DATE_TIME)) +
+                formatParameter(URL_DEPARTURE, departure.format(DateTimeFormatters.ISO_LOCAL_DATE_TIME_NO_NANOSECONDS)) +
                 formatParameter(URL_MODE) +
                 formatParameter(URL_COMBINE_CHANGE);
     }
