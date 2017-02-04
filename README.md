@@ -2,6 +2,7 @@
 
 ## Releases
 
+* **[v0.2](https://tubcloud.tu-berlin.de/index.php/s/keQMZ2NlZgoFA4i)**
 * [v0.1](https://tubcloud.tu-berlin.de/index.php/s/hL4ldj5D9rvADqp)
 
 ## Members

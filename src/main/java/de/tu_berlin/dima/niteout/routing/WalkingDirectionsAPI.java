@@ -4,7 +4,6 @@ import de.tu_berlin.dima.niteout.routing.model.Location;
 import de.tu_berlin.dima.niteout.routing.model.RouteSummary;
 import de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,17 +13,17 @@ import java.util.List;
 public interface WalkingDirectionsAPI {
 
     int getWalkingTripTime(Location startLocation,
-                           Location destinationLocation) throws IOException;
+                           Location destinationLocation) throws RoutingAPIException;
 
     int getWalkingTripTime(Location startLocation,
                            Location destinationLocation,
-                           LocalDateTime startTime) throws IOException;
+                           LocalDateTime startTime) throws RoutingAPIException;
 
-    RouteSummary getWalkingRouteSummary(Location start, Location destination) throws IOException;
+    RouteSummary getWalkingRouteSummary(Location start, Location destination) throws RoutingAPIException;
 
     RouteSummary getWalkingRouteSummary(Location start, Location destination,
-                                        LocalDateTime departureTime) throws IOException;
+                                        LocalDateTime departureTime) throws RoutingAPIException;
 
     List<TimeMatrixEntry> getWalkingMatrix(Location[] startLocations,
-                                           Location[] destinationLocations) throws IOException;
+                                           Location[] destinationLocations) throws RoutingAPIException;
 }

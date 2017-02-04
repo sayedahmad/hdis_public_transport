@@ -5,15 +5,13 @@ import de.tu_berlin.dima.niteout.routing.model.Location;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 
 /**
  * A wrapper for the Mapzen Search API.
  * NOTE: This wrapper only implements the a subset of the functionality offered by the API
  * @author Andres Ardila
- * @see https://mapzen.com/products/search/
+ * see also https://mapzen.com/products/search/
  * 
  */
 class MapzenSearchApiWrapper extends MapzenApi implements GeocodingAPI {
@@ -25,7 +23,7 @@ class MapzenSearchApiWrapper extends MapzenApi implements GeocodingAPI {
     }
 
     @Override
-    public Location getLocation(Address address) throws IOException {
+    public Location getLocation(Address address) throws RoutingAPIException {
         LinkedHashMap<String, String> queryString = new LinkedHashMap<>();
         queryString.put("address", address.getStreet() + " " + address.getHouseNumber());
         queryString.put("locality", address.getCity());
@@ -34,13 +32,7 @@ class MapzenSearchApiWrapper extends MapzenApi implements GeocodingAPI {
         queryString.put("size", "1");
         queryString.put("api_key", super.apiKey);
 
-        JsonObject responseJson = null;
-        try {
-            responseJson = super.getResponse(endpoint, queryString);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            //TODO
-        }
+        JsonObject responseJson = super.getResponse(endpoint, queryString);
         JsonArray features = responseJson.getJsonArray("features");
 
         Location location = null;
