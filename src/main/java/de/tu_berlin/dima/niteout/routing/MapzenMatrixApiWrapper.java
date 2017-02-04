@@ -88,13 +88,19 @@ class MapzenMatrixApiWrapper extends MapzenApi {
             int fromIndex = jsonObject.getInt("from_index");
             if (fromIndex >= startLocations.length) continue; //skip last combination ("from destination to destination")
 
-            TimeMatrixEntry entry = new TimeMatrixEntry(
-                    fromIndex,
-                    0,
-                    jsonObject.getInt("time"),
-                    jsonObject.getJsonNumber("distance").doubleValue(),
-                    MatrixDistanceUnits
-            );
+            TimeMatrixEntry entry;
+            try {
+                entry = new TimeMatrixEntry(
+                        fromIndex,
+                        0,
+                        jsonObject.getInt("time"),
+                        jsonObject.getJsonNumber("distance").doubleValue(),
+                        MatrixDistanceUnits);
+            } catch (ClassCastException e) {
+                throw new RoutingAPIException(RoutingAPIException.ErrorCode.PROCESS_RESPONSE_ERROR_JSON,
+                        "could not cast JsonValue to JsonNumber when trying to get time and distance from json \n"
+                        + jsonObject.toString());
+            }
             out.add(entry);
         }
         return out;

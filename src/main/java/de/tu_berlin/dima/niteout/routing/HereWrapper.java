@@ -75,7 +75,7 @@ class HereWrapper implements PublicTransportWrapper {
 
     @Override
     public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure) throws RoutingAPIException {
-        return getMatrixEntryForRouteArguments(0,0,start,destination,departure).getTime();
+        return getMatrixEntryForRouteArguments(0, 0, start, destination, departure).getTime();
     }
 
     public List<TimeMatrixEntry> getMultiModalMatrix(Location[] startLocations, Location[] destinationLocations,
@@ -89,11 +89,12 @@ class HereWrapper implements PublicTransportWrapper {
 
         try {
             matrix = startIndices.parallel()
-                    .mapToObj(i -> IntStream.range(0, destinationLocations.length - 1)
+                    .mapToObj(i -> IntStream.range(0, destinationLocations.length)
                             .mapToObj(j -> {
                                 try {
                                     return getMatrixEntryForRouteArguments(i, j, startLocations[i], destinationLocations[j], departureTime);
                                 } catch (RoutingAPIException e) {
+                                    // do ugly exception wrapping
                                     throw new RuntimeException(e);
                                 }
                             })
@@ -101,6 +102,7 @@ class HereWrapper implements PublicTransportWrapper {
                     .flatMap(l -> l.stream())
                     .collect(toList());
         } catch (RuntimeException e) {
+            // unwrap ugly wrapped exception if it is RoutingApiException
             if (e.getCause() != null && e.getCause() instanceof RoutingAPIException) {
                 throw (RoutingAPIException) e.getCause();
             }
@@ -114,30 +116,41 @@ class HereWrapper implements PublicTransportWrapper {
 
         Reader response = getHTTPResponse(start, destination, departure);
         assert response != null;
-        JsonObject json = null;
+        JsonObject json;
 
         try {
             json = Json.createReader(response).readObject();
         } catch (JsonParsingException e) {
-            System.out.println(LocalDateTime.now() + ":: fail     #" + fromIndex + ":" + toIndex + "\t " + e.getClass().getSimpleName());
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.PROCESS_RESPONSE_ERROR_JSON, "here.com api " +
+                    "response could not be converted to json, probably it returned an error instead of json", e);
         }
 
         assert json != null;
         return getTimeMatrixEntryFromJsonRoute(fromIndex, toIndex, json);
     }
 
-    private TimeMatrixEntry getTimeMatrixEntryFromJsonRoute(int fromIndex, int toIndex, JsonObject json) {
+    private TimeMatrixEntry getTimeMatrixEntryFromJsonRoute(int fromIndex, int toIndex, JsonObject json) throws RoutingAPIException {
 
-        // only get first RouteSummary as it will not return alternatives due to missing 'alternative' request parameter
-        JsonObject jsonRouteSummary = json
-                .getJsonObject("response")
-                .getJsonArray("route")
-                .getJsonObject(0)
-                .getJsonObject("summary");
+        // error handling
+
+
+        JsonObject jsonRouteSummary;
+
+        try {
+            // only get first RouteSummary as it will not return alternatives due to missing 'alternative' request parameter
+            jsonRouteSummary = json
+                    .getJsonObject("response")
+                    .getJsonArray("route")
+                    .getJsonObject(0)
+                    .getJsonObject("summary");
+        } catch (NullPointerException e) {
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.PROCESS_RESPONSE_ERROR_JSON, "here.com api " +
+                    "response does not contain any routes: " + json.toString(), e);
+        }
 
         int distance = jsonRouteSummary.getInt("distance");
         int time = jsonRouteSummary.getInt("baseTime");
-        
+
         return new TimeMatrixEntry(fromIndex, toIndex, time, distance, DistanceUnits.KILOMETERS);
     }
 
@@ -149,7 +162,8 @@ class HereWrapper implements PublicTransportWrapper {
         try {
             json = Json.createReader(responseReader).readObject();
         } catch (JsonParsingException e) {
-            System.out.println(LocalDateTime.now() + ":: fail getPublicTransportDirections: " + e.getMessage());
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.PROCESS_RESPONSE_ERROR_JSON, "here.com api " +
+                    "response could not be converted to json", e);
         }
 
         assert json != null;
@@ -166,8 +180,8 @@ class HereWrapper implements PublicTransportWrapper {
                     .getJsonArray("route")
                     .getJsonObject(0);
         } catch (NullPointerException e) {
-            System.err.println("no route in:\n" + json.toString());
-            throw new IllegalStateException("no route in response");
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.PROCESS_RESPONSE_ERROR_JSON, "here.com api " +
+                    "response does not contain any routes: " + json.toString(), e);
         }
 
         assert route != null;
@@ -194,7 +208,7 @@ class HereWrapper implements PublicTransportWrapper {
                     default:
                         throw new RoutingAPIException(RoutingAPIException.ErrorCode.DATA_SOURCE_RESPONSE_INVALID,
                                 "can not handle transport type ["
-                        + type + "] in response by here.com: \n" + route);
+                                        + type + "] in response by here.com: \n" + route);
                 }
             }
         }

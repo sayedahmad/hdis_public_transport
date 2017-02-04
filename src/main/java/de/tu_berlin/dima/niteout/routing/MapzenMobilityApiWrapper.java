@@ -22,8 +22,7 @@ import javax.json.*;
  */
 class MapzenMobilityApiWrapper extends MapzenApi {
 
-    private static final DateTimeFormatter ISO8601_DATE_TIME_FORMATTER =
-            DateTimeFormatter.ofPattern("YYYY-MM-DD'T'HH:mm");
+    public final static DateTimeFormatter ISO_LOCAL_DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
     public MapzenMobilityApiWrapper(String apiKey) throws RoutingAPIException {
 
@@ -141,7 +140,7 @@ class MapzenMobilityApiWrapper extends MapzenApi {
 
             jsonObjectBuilder.add("date_time", Json.createObjectBuilder()
                     .add("type", 1)
-                    .add("value", departureTime.format(ISO8601_DATE_TIME_FORMATTER)));
+                    .add("value", departureTime.format(ISO_LOCAL_DATE_TIME)));
         }
 
         JsonObject json = jsonObjectBuilder.build();

@@ -33,12 +33,17 @@ abstract class MapzenApi {
 
     protected JsonObject getResponse(String endpoint, JsonObject jsonObject) throws RoutingAPIException {
         final String url;
+        final JsonObject json;
         try {
             url = getUrl(endpoint, jsonObject);
-            return getResponse(url);
+            json =  getResponse(url);
         } catch (URISyntaxException e) {
             throw new RoutingAPIException(RoutingAPIException.ErrorCode.INVALID_URI_SYNTAX, e);
         }
+        if (json.containsKey("status_code") && json.getJsonNumber("status_code").intValue() != 200) {
+            throw RoutingAPIException.buildFromStatusCode(json.getJsonNumber("status_code").intValue(), json.toString());
+        }
+        return json;
     }
 
     protected JsonObject getResponse(String endpoint, LinkedHashMap<String, String> queryString) throws RoutingAPIException {
