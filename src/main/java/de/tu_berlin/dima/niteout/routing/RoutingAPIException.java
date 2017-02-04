@@ -1,5 +1,7 @@
 package de.tu_berlin.dima.niteout.routing;
 
+import static de.tu_berlin.dima.niteout.routing.RoutingAPIException.ErrorCode.*;
+
 /**
  * The class {@code RoutingAPIException} is a form of {@code Exception} that
  * indicates conditions that an application using the RoutingAPI might want to
@@ -85,6 +87,34 @@ public class RoutingAPIException extends Exception {
         return code;
     }
 
+    public static RoutingAPIException buildFromStatusCode(int statusCode, String message) {
+        return new RoutingAPIException(getErrorForStatusCode(statusCode), message);
+    }
+
+    public static RoutingAPIException buildFromStatusCode(int statusCode) {
+        return new RoutingAPIException(getErrorForStatusCode(statusCode));
+    }
+
+    private static ErrorCode getErrorForStatusCode(int statusCode) {
+        switch (statusCode) {
+            case 200:
+                throw new IllegalArgumentException("200 is not an erroneous status code!");
+            case 400:
+                return API_ERROR_BAD_REQUEST;
+            case 404:
+                return API_ERROR_NOT_FOUND;
+            case 405:
+                return API_ERROR_WRONG_METHOD;
+            case 500:
+                return API_ERROR_INTERNAL;
+            case 501:
+                return API_ERROR_NOT_IMPLEMENTED;
+            default:
+                return HTTP;
+        }
+    }
+
+
 
     public enum ErrorCode {
 
@@ -92,7 +122,13 @@ public class RoutingAPIException extends Exception {
         DATA_SOURCE_RESPONSE_INVALID("The RoutingAPI could not handle the response from the server"),
         INVALID_TRANSPORT_MODE("An invalid transport mode was requested to the RoutingAPI"),
         INVALID_URI_SYNTAX("Could not build a valid URI"),
-        HTTP("Something went wrong when requesting the api, see chained exception");
+        HTTP("Something went wrong when requesting the api, see chained exception"),
+        API_ERROR_BAD_REQUEST("Request to data source was corrupted, see exception message, if available"),
+        API_ERROR_WRONG_METHOD("405 - The used HTTP method was wrong, maybe try GET or POST"),
+        API_ERROR_NOT_FOUND("404 - Request endpoint was not found"),
+        API_ERROR_INTERNAL("500 - Data source API had an internal error"),
+        API_ERROR_NOT_IMPLEMENTED("501 - Request endpoint not implemented"),
+        PROCESS_RESPONSE_ERROR_JSON("Error while processing JSON response");
 
         public final String message;
 
