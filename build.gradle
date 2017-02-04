@@ -15,9 +15,10 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
-task deliverableJar(type: Jar) {
-    baseName = project.name + '-inclibs'
+task deliverableJar(type: Jar, dependsOn: classes) {
+    //baseName = project.name + '-inclibs'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from sourceSets.main.allSource
     with jar
 }
 
