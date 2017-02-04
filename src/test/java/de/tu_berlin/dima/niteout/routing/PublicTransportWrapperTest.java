@@ -50,14 +50,15 @@ public class PublicTransportWrapperTest {
     @Test
     public void getMatrixTestFromAndToRandomLocationsInBerlin() {
         Location[] starts = new Location[5],
-                destinations = new Location[10];
+                destinations = new Location[3];
+        int expected = starts.length * destinations.length;
         for (int i = 0; i < starts.length; i++) {
             starts[i] = LocationDirectory.getRandomLocation(BERLIN_MITTE);
         }
         for (int i = 0; i < destinations.length; i++) {
             destinations[i] = LocationDirectory.getRandomLocation(BERLIN_MITTE);
         }
-        boolean[] indexed = new boolean[starts.length * destinations.length];
+        boolean[] indexed = new boolean[expected];
         long start = System.currentTimeMillis();
         List<TimeMatrixEntry> list = null;
         try {
@@ -65,9 +66,9 @@ public class PublicTransportWrapperTest {
         } catch (RoutingAPIException e) {
             fail(e.getMessage());
         }
-        System.out.print("duration 50 calls: " + (System.currentTimeMillis() - start) + "ms");
+        System.out.print("duration " + expected + " calls: " + (System.currentTimeMillis() - start) + "ms");
         assertNotNull(list);
-        assertEquals(list.size(), 50);
+        assertEquals(expected, list.size());
         list.forEach((TimeMatrixEntry e) -> {
             assertTrue(e.getTime() > 0);
             assertTrue(e.getTime() < 14400);

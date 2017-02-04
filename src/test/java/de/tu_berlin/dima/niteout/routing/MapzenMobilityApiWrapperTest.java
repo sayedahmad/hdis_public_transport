@@ -7,6 +7,8 @@ import org.junit.Test;
 
 import java.time.LocalDateTime;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test class for {@link MapzenMobilityApiWrapper}.
  */
@@ -50,9 +52,9 @@ public class MapzenMobilityApiWrapperTest {
                     LocationDirectory.TU_BERLIN,
                     LocationDirectory.HAUPTBAHNHOF,
                     LocalDateTime.now());
+            Assert.fail("should not reach this point as no public transport is implemented");
         } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
+            assertTrue(e instanceof RoutingAPIException);
         }
 
         Assert.assertNotEquals(tripDuration, -1);
