@@ -4,7 +4,6 @@ import de.tu_berlin.dima.niteout.routing.model.Location;
 import de.tu_berlin.dima.niteout.routing.model.RouteSummary;
 import de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,13 +20,13 @@ class MapzenApiWrapper implements WalkingDirectionsAPI {
     }
 
     @Override
-    public int getWalkingTripTime(Location start, Location destination) throws IOException {
+    public int getWalkingTripTime(Location start, Location destination) throws RoutingAPIException {
         return getWalkingTripTime(start, destination, null);
     }
 
     @Override
     public int getWalkingTripTime(Location start, Location destination,
-                                  LocalDateTime departureTime) throws IOException {
+                                  LocalDateTime departureTime) throws RoutingAPIException {
         MapzenMobilityApiWrapper mobilityWrapper = new MapzenMobilityApiWrapper(apiKey);
         return departureTime == null ?
                 mobilityWrapper.getWalkingTripTime(start, destination) :
@@ -35,13 +34,13 @@ class MapzenApiWrapper implements WalkingDirectionsAPI {
     }
 
     @Override
-    public RouteSummary getWalkingRouteSummary(Location start, Location destination) throws IOException {
+    public RouteSummary getWalkingRouteSummary(Location start, Location destination) throws RoutingAPIException {
         return getWalkingRouteSummary(start, destination, null);
     }
 
     @Override
     public RouteSummary getWalkingRouteSummary(Location start, Location destination,
-                                               LocalDateTime departureTime) throws IOException {
+                                               LocalDateTime departureTime) throws RoutingAPIException {
         MapzenMobilityApiWrapper mobilityWrapper = new MapzenMobilityApiWrapper(apiKey);
         return departureTime == null ?
                 mobilityWrapper.getWalkingRouteSummary(start, destination) :
@@ -50,7 +49,7 @@ class MapzenApiWrapper implements WalkingDirectionsAPI {
 
     @Override
     public List<TimeMatrixEntry> getWalkingMatrix(Location[] startLocations,
-                                                  Location[] destinationLocations) throws IOException {
+                                                  Location[] destinationLocations) throws RoutingAPIException {
 
         MapzenMatrixApiWrapper matrixWrapper = new MapzenMatrixApiWrapper(this.apiKey);
         return matrixWrapper.getWalkingMatrix(startLocations, destinationLocations);
