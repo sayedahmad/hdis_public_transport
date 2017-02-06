@@ -7,7 +7,7 @@ import de.tu_berlin.dima.niteout.routing.model.TimeMatrixEntry;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface PublicTranportAPI {
+public interface PublicTransportWrapper {
 
     /**
      * Get the amount of time in seconds to travel between two locations with, or walking if public
@@ -17,7 +17,8 @@ public interface PublicTranportAPI {
      * @param departure the date and time at which the trip starts
      * @return the total number of seconds required for the trip
      */
-    int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure);
+    int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departure) throws
+            RoutingAPIException;
 
     /**
      * Gets the summary details about a route between two locations with public transport, or walking if public
@@ -27,7 +28,8 @@ public interface PublicTranportAPI {
      * @param departure the date and time at which the trip starts
      * @return a RouteSummary with the details about the route
      */
-    RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime departure);
+    RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime departure)
+            throws RoutingAPIException;
 
     /**
      * Gets a matrix with trip information between start and destination locations using public transport,
@@ -38,6 +40,5 @@ public interface PublicTranportAPI {
      * @return a matrix with trip information between start and destination locations
      */
     List<TimeMatrixEntry> getMultiModalMatrix(Location[] startLocations, Location[] destinationLocations,
-                                              LocalDateTime departureTime);
-
+                                              LocalDateTime departureTime) throws RoutingAPIException;
 }

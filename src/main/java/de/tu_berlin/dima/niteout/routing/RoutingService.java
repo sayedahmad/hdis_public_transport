@@ -2,7 +2,6 @@ package de.tu_berlin.dima.niteout.routing;
 
 import de.tu_berlin.dima.niteout.routing.model.*;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,16 +31,16 @@ public class RoutingService implements RoutingAPI {
     }
 
 
-    private PublicTranportAPI publicTranportAPI;
+    private PublicTransportWrapper publicTransportWrapper;
     private WalkingDirectionsAPI walkingDirectionsAPI;
 
     // API lazy initialization
-    private PublicTranportAPI getPublicTransportAPI() {
-        if (publicTranportAPI == null) {
+    private PublicTransportWrapper getPublicTransportAPI() throws RoutingAPIException {
+        if (publicTransportWrapper == null) {
             // injection - TODO discuss if we use "proper" injection
-            publicTranportAPI = new HereApiWrapper(Settings.getHereApiAppID(), Settings.getHereApiAppCode());
+            publicTransportWrapper = new HereWrapper(Settings.getHereApiAppID(), Settings.getHereApiAppCode());
         }
-        return publicTranportAPI;
+        return publicTransportWrapper;
     }
 
     private WalkingDirectionsAPI getWalkingDirectionsAPI() {
@@ -59,7 +58,7 @@ public class RoutingService implements RoutingAPI {
      * @param startTime   The time at which the journey will begin
      * @return The total travel time in seconds
      */
-    private int getPublicTransportTripTime(Location start, Location destination, LocalDateTime startTime) {
+    private int getPublicTransportTripTime(Location start, Location destination, LocalDateTime startTime) throws RoutingAPIException {
         return getPublicTransportAPI().getPublicTransportTripTime(start, destination, startTime);
     }
 
@@ -70,25 +69,25 @@ public class RoutingService implements RoutingAPI {
      * @param destination The destination location
      * @return The travel time in seconds
      */
-    private int getWalkingTripTime(Location start, Location destination) throws IOException {
+    private int getWalkingTripTime(Location start, Location destination) throws RoutingAPIException {
 
         return getWalkingDirectionsAPI().getWalkingTripTime(start, destination);
     }
 
-    private RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime) {
+    private RouteSummary getPublicTransportRouteSummary(Location start, Location destination, LocalDateTime startTime)
+            throws RoutingAPIException {
         return getPublicTransportAPI().getPublicTransportRouteSummary(start, destination, startTime);
     }
 
-    private RouteSummary getWalkingRouteSummary(Location start, Location destination, LocalDateTime startTime) throws IOException {
+    private RouteSummary getWalkingRouteSummary(Location start, Location destination, LocalDateTime startTime) throws RoutingAPIException {
 
-        RouteSummary routeSummary = getWalkingDirectionsAPI().getWalkingRouteSummary(start, destination, startTime);
-        return routeSummary;
+        return getWalkingDirectionsAPI().getWalkingRouteSummary(start, destination, startTime);
     }
 
     @Override
     public int getTripTime(TransportMode transportMode,
                            Location startLocation, Location destinationLocation,
-                           LocalDateTime startTime) throws IOException {
+                           LocalDateTime startTime) throws RoutingAPIException {
         switch (transportMode) {
 
             case PUBLIC_TRANSPORT:
@@ -98,14 +97,14 @@ public class RoutingService implements RoutingAPI {
                 return this.getWalkingTripTime(startLocation, destinationLocation);
 
             default:
-                throw new IllegalArgumentException("transportMode");
+                throw createInvalidTransportModeException(transportMode);
         }
     }
 
     @Override
     public RouteSummary getRouteSummary(TransportMode transportMode,
                                         Location startLocation, Location destinationLocation,
-                                        LocalDateTime startTime) throws IOException {
+                                        LocalDateTime startTime) throws RoutingAPIException {
         switch (transportMode) {
 
             case PUBLIC_TRANSPORT:
@@ -115,14 +114,14 @@ public class RoutingService implements RoutingAPI {
                 return this.getWalkingRouteSummary(startLocation, destinationLocation, startTime);
 
             default:
-                throw new IllegalArgumentException("transportMode");
+                throw createInvalidTransportModeException(transportMode);
         }
     }
 
     @Override
     public List<TimeMatrixEntry> getMatrix(TransportMode transportMode,
                                            Location[] startLocations, Location[] destinationLocations,
-                                           LocalDateTime startTime) throws IOException {
+                                           LocalDateTime startTime) throws RoutingAPIException {
         switch (transportMode) {
 
             case PUBLIC_TRANSPORT:
@@ -132,7 +131,13 @@ public class RoutingService implements RoutingAPI {
                 return getWalkingDirectionsAPI().getWalkingMatrix(startLocations, destinationLocations);
 
             default:
-                throw new IllegalArgumentException("transportMode");
+                throw createInvalidTransportModeException(transportMode);
         }
+    }
+
+    private RoutingAPIException createInvalidTransportModeException(TransportMode transportMode) {
+        return new RoutingAPIException(RoutingAPIException.ErrorCode.INVALID_TRANSPORT_MODE, "Can not request" +
+                " for transport mode [" + transportMode + "]. Only " + TransportMode.PUBLIC_TRANSPORT +
+                " and " + TransportMode.WALKING + " are available.");
     }
 }

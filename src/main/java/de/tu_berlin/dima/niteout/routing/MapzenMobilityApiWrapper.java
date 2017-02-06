@@ -21,20 +21,21 @@ import javax.json.*;
  */
 class MapzenMobilityApiWrapper extends MapzenApi {
 
-    public MapzenMobilityApiWrapper(String apiKey) {
+    public MapzenMobilityApiWrapper(String apiKey) throws RoutingAPIException {
 
         super("valhalla", apiKey);
 
         if (apiKey == null || apiKey.trim().length() == 0)
-            throw new IllegalArgumentException("apiKey cannot be null or empty");
+            throw new RoutingAPIException(RoutingAPIException.ErrorCode.API_CREDENTIALS_INVALID,
+                    "The api key for mapzen was either empty or not set or could not accessed.");
     }
 
-    public int getWalkingTripTime(Location start, Location destination) throws IOException {
+    public int getWalkingTripTime(Location start, Location destination) throws RoutingAPIException {
 
         return getWalkingTripTime(start, destination, null);
     }
 
-    public int getWalkingTripTime(Location start, Location destination, LocalDateTime departureTime) throws IOException {
+    public int getWalkingTripTime(Location start, Location destination, LocalDateTime departureTime) throws RoutingAPIException {
 
         JsonObject response = departureTime == null ?
                 getRouteResponse(start, destination, CostingModel.PEDESTRIAN) :
@@ -44,7 +45,7 @@ class MapzenMobilityApiWrapper extends MapzenApi {
         return tripDuration;
     }
 
-    public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departureTime) throws IOException {
+    public int getPublicTransportTripTime(Location start, Location destination, LocalDateTime departureTime) throws RoutingAPIException {
 
         //WARNING: multimodal currently supports pedestrian and transit. In the future, multimodal will return a combination of all modes of transport (including auto).
         JsonObject response = getRouteResponse(start, destination, CostingModel.MULTIMODAL, departureTime);
@@ -53,7 +54,7 @@ class MapzenMobilityApiWrapper extends MapzenApi {
         return tripDuration;
     }
 
-    public RouteSummary getWalkingRouteSummary(Location start, Location destination) throws IOException {
+    public RouteSummary getWalkingRouteSummary(Location start, Location destination) throws RoutingAPIException {
 
         JsonObject response = getRouteResponse(start, destination, CostingModel.PEDESTRIAN);
         RouteSummary routeSummary = new RouteSummary();
@@ -66,7 +67,7 @@ class MapzenMobilityApiWrapper extends MapzenApi {
         return routeSummary;
     }
 
-    public RouteSummary getWalkingRouteSummary(Location start, Location destination, LocalDateTime dateTime) throws IOException {
+    public RouteSummary getWalkingRouteSummary(Location start, Location destination, LocalDateTime dateTime) throws RoutingAPIException {
         JsonObject response = getRouteResponse(start, destination, CostingModel.PEDESTRIAN, dateTime);
         JsonObject summaryJsonObject = response.getJsonObject("trip").getJsonObject("summary");
 
@@ -124,13 +125,13 @@ class MapzenMobilityApiWrapper extends MapzenApi {
         return dateTimeString.substring(0,16)+"+"+dateTimeString.substring(16);
     }
 
-    private JsonObject getRouteResponse(Location start, Location destination, CostingModel costingModel) throws IOException {
+    private JsonObject getRouteResponse(Location start, Location destination, CostingModel costingModel) throws RoutingAPIException {
         return getRouteResponse(start, destination, costingModel, null);
     }
 
     private JsonObject getRouteResponse(
             Location start, Location destination,
-            CostingModel costingModel, LocalDateTime departureTime) throws IOException {
+            CostingModel costingModel, LocalDateTime departureTime) throws RoutingAPIException {
 
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder()
                 .add("locations", Json.createArrayBuilder()
@@ -154,14 +155,7 @@ class MapzenMobilityApiWrapper extends MapzenApi {
 
         JsonObject json = jsonObjectBuilder.build();
 
-        JsonObject responseJsonObject = null;
-
-        try {
-            responseJsonObject = super.getResponse("route", json);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            //TODO
-        }
+        JsonObject responseJsonObject = super.getResponse("route", json);
 
         return responseJsonObject;
     }

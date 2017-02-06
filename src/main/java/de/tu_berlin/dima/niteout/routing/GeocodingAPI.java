@@ -10,5 +10,5 @@ import java.io.IOException;
  */
 public interface GeocodingAPI {
 
-    Location getLocation(Address address) throws IOException;
+    Location getLocation(Address address) throws RoutingAPIException;
 }
