@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -54,9 +53,6 @@ class HereWrapper implements PublicTransportWrapper {
     private final static String URL_MODE = "mode=fastest;publicTransport";
     private final static String URL_COMBINE_CHANGE = "combineChange=true";
     private final static double MAX_API_RPS = 1;
-
-
-    public final static DateTimeFormatter ISO_LOCAL_DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     private final String apiId;
     private final String apiCode;
@@ -271,7 +267,7 @@ class HereWrapper implements PublicTransportWrapper {
                 formatParameter(URL_APP_CODE, apiCode) +
                 formatParameter(URL_START, start.getLatitude(), start.getLongitude()) +
                 formatParameter(URL_DESTINATION, destination.getLatitude(), destination.getLongitude()) +
-                formatParameter(URL_DEPARTURE, departure.format(ISO_LOCAL_DATE_TIME)) +
+                formatParameter(URL_DEPARTURE, departure.format(DateTimeFormatters.ISO_LOCAL_DATE_TIME_NO_NANOSECONDS)) +
                 formatParameter(URL_MODE) +
                 formatParameter(URL_COMBINE_CHANGE);
     }
